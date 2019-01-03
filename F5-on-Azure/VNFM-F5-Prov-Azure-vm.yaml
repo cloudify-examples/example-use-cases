@@ -1,0 +1,85 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Create an instance of BIG-IP on Azure.
+
+imports:
+  - Resources/network.yaml
+
+inputs:
+
+  virtual_machine_size:
+    default: Standard_A7
+
+  vm_name:
+    default: F5-LoadBalancer
+
+  virtual_machine_image_sku:
+    default: 'f5-bigip-virtual-edition-1g-best-hourly'
+
+  virtual_machine_image_publisher:
+    default: '5-networks'
+
+  virtual_machine_image_offer:
+    default: 'f5-big-ip-best'
+
+
+dsl_definitions:
+
+  client_config: &client_config
+    subscription_id: { get_secret: subscription_id }
+    tenant_id: { get_secret: tenant_id }
+    client_id: { get_secret: client_id }
+    client_secret: { get_secret: client_secret }
+
+node_templates:
+
+  virtual_machine:
+    type: cloudify.azure.nodes.compute.VirtualMachine
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, {get_input: vm_name}, { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      os_family: linux
+      agent_config:
+        install_method: none
+      plan:
+        name: { get_input: virtual_machine_image_sku }
+        publisher: { get_input: virtual_machine_image_publisher }
+        product: { get_input: virtual_machine_image_offer }
+      resource_config:
+        hardwareProfile:
+          vmSize: { get_input: virtual_machine_size }
+        storageProfile:
+          imageReference:
+            publisher: { get_input: virtual_machine_image_publisher }
+            offer: { get_input: virtual_machine_image_offer }
+            sku: { get_input: virtual_machine_image_sku }
+            version: latest
+        osProfile:
+          computerName: { get_property: [SELF, name] }
+          adminUsername: cloudify
+          adminPassword: ''
+    relationships:
+    - type: cloudify.azure.relationships.contained_in_resource_group
+      target: resource_group
+    - type: cloudify.azure.relationships.connected_to_storage_account
+      target: storage_account
+    - type: cloudify.azure.relationships.connected_to_nic
+      target: azure_nic
+
+  storage_account:
+    type: cloudify.azure.nodes.storage.StorageAccount
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'storage', { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      resource_config:
+        accountType: Standard_LRS
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+#TODO: According to best practises - add outputs of the vm's end points
