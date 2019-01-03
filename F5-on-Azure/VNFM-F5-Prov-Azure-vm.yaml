@@ -15,13 +15,19 @@ inputs:
     default: F5-LoadBalancer
 
   virtual_machine_image_sku:
-    default: 'f5-bigip-virtual-edition-1g-best-hourly'
+    default: 'f5-big-all-1slot-byol'
 
   virtual_machine_image_publisher:
-    default: '5-networks'
+    default: 'f5-networks'
 
   virtual_machine_image_offer:
-    default: 'f5-big-ip-best'
+    default: 'f5-big-ip-byol'
+
+  bigip_username:
+    default: 'cloudify'
+
+  bigip_password:
+    default: 'Cloudify1234'
 
 
 dsl_definitions:
@@ -59,8 +65,8 @@ node_templates:
             version: latest
         osProfile:
           computerName: { get_property: [SELF, name] }
-          adminUsername: cloudify
-          adminPassword: ''
+          adminUsername: { get_input: bigip_username }
+          adminPassword: { get_input: bigip_password }
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
