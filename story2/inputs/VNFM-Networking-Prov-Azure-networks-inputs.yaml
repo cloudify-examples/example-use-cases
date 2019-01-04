@@ -1,0 +1,41 @@
+subscription_id: { get_secret: azure_subscription_id }
+tenant_id: { get_secret: azure_tenant_id }
+client_id: { get_secret: azure_client_id }
+client_secret: { get_secret: azure_client_secret }
+endpoint_resource: https://management.core.windows.net/
+endpoints_resource_manager: https://management.azure.com
+endpoint_verify: True
+endpoint_storage: core.windows.net
+endpoints_active_directory: https://login.microsoftonline.com
+location: { get_secret: azure_location }
+retry_after: 5
+resource_prefix: jaroslaw
+resource_suffix: 0
+mgmt_subnet_cidr: 10.10.1.0/24
+public_subnet_cidr: 10.10.2.0/24
+wan_subnet_cidr: 10.10.3.0/24
+lan_subnet_cidr: 10.10.4.0/24
+network_api_version: "2015-06-15"
+network_security_group_rules:
+  - name: all_tcp
+    properties:
+      description: All TCP
+      protocol: Tcp
+      sourcePortRange: '*'
+      destinationPortRange: '*'
+      sourceAddressPrefix: '*'
+      destinationAddressPrefix: '*'
+      priority: 100
+      access: Allow
+      direction: Inbound
+  - name: all_ucp
+    properties:
+      description: All UDP
+      protocol: Udp
+      sourcePortRange: '*'
+      destinationPortRange: '*'
+      sourceAddressPrefix: '*'
+      destinationAddressPrefix: '*'
+      priority: 101
+      access: Allow
+      direction: Inbound
