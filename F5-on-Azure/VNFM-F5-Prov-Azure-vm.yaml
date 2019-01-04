@@ -4,7 +4,7 @@ description: >
   Create an instance of BIG-IP on Azure.
 
 imports:
-  - Resources/network.yaml
+  - Resources/nics.yaml
 
 inputs:
 
@@ -22,12 +22,6 @@ inputs:
 
   virtual_machine_image_offer:
     default: 'f5-big-ip-byol'
-
-  bigip_username:
-    default: 'cloudify'
-
-  bigip_password:
-    default: 'Cloudify1234'
 
 
 dsl_definitions:
@@ -65,15 +59,19 @@ node_templates:
             version: latest
         osProfile:
           computerName: { get_property: [SELF, name] }
-          adminUsername: { get_input: bigip_username }
-          adminPassword: { get_input: bigip_password }
+          adminUsername: { get_secret: bigip_username }
+          adminPassword: { get_secret: bigip_password }
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
     - type: cloudify.azure.relationships.connected_to_storage_account
       target: storage_account
     - type: cloudify.azure.relationships.connected_to_nic
-      target: azure_nic
+      target: mgmt_nic
+    - type: cloudify.azure.relationships.connected_to_nic
+      target: public_nic
+    - type: cloudify.azure.relationships.connected_to_nic
+      target: wan_nic
 
   storage_account:
     type: cloudify.azure.nodes.storage.StorageAccount
@@ -88,4 +86,17 @@ node_templates:
       - type: cloudify.azure.relationships.contained_in_resource_group
         target: resource_group
 
-#TODO: According to best practises - add outputs of the vm's end points
+capabilities:
+  mgmt_nic:
+    value:
+      name: { get_attribute: [mgmt_nic, name] }
+      ip: { get_attribute: [virtual_machine, ip] }
+      public_ip: { get_attribute: [virtual_machine, public_ip] }
+  wan_nic:
+    value:
+      name: { get_attribute: [wan_nic, name] }
+  public_nic:
+    value:
+      name: { get_attribute: [public_nic, name] }
+  vm_name:
+    value: { get_attribute: [virtual_machine, name] }
