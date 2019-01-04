@@ -64,7 +64,7 @@ inputs:
   vm_size:
     type: string
     required: true
-    default: Standard_A7
+    default: Standard_F2s_v2
 
   vm_os_family:
     type: string

@@ -13,7 +13,7 @@ resource_suffix: 0
 endpoints_active_directory: https://login.microsoftonline.com
 azure_network_blueprint_name: azure-networks-bp
 azure_network_deployment_name: azure-networks
-vm_size: Standard_A7
+vm_size: Standard_F2s_v2
 vm_os_family: linux
 vm_image_publisher: fortinet
 vm_image_offer: fortinet_fortigate-vm_v5
