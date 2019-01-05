@@ -1,16 +1,16 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - http://www.getcloudify.org/spec/cloudify/4.5.5/types.yaml
+  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
   - plugin:cloudify-openstack-plugin
 
 inputs:
   manager_network:
-    default: external
-  agent_key_private:
+    description: manager network
+  private_key_path:
     description: >
       The content of the agent's private key.
-    default: { get_secret: agent_key_private }
+    default: { get_secret: private_key_path }
   agent_user:
     description: >
       The username of the agent running on the instance created from the image.
@@ -19,7 +19,7 @@ inputs:
     description: >
       An Openstack Image ID. Tested with a Ubuntu 14.04 image.
     type: string
-    default: { get_secret: ubuntu_trusty_image }
+    default: 05bb3a46-ca32-4032-bedd-8d7ebd5c8100
   flavor:
     description: >
       An Openstack Flavor ID.
@@ -30,6 +30,7 @@ inputs:
     description: list of connected to network
 
 dsl_definitions:
+
   openstack_config: &openstack_config
     username: { get_secret: keystone_username }
     password: { get_secret: keystone_password }
@@ -41,24 +42,16 @@ node_types:
   host:
     derived_from: cloudify.openstack.nodes.Server
     properties:
-      openstack_config: *openstack_config
-      server:
-        networks: { get_input: vm_network_list }
+      openstack_config:
+        default: *openstack_config
       agent_config:
-        network: { get_input: manager_network }
-        user: { get_input: agent_user }
-        install_method: init_script
-        port: 22
-        key: { get_input: agent_key_private }
+        default:
+          user: { get_input: agent_user }
+          key: { get_input: private_key_path }
       server:
-        key_name: { get_input: key_pair_name }
-        image: { get_input: image_name }
-        flavor: { get_input: flavor }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: openstack.nova_plugin.server.create
-          inputs:
-            args:
-              image: { get_input: image }
-              flavor: { get_input: flavor }
+        default:
+          key_name: ''
+          image: { get_input: image_name }
+          flavor: { get_input: flavor }
+      management_network_name:
+        default: ''

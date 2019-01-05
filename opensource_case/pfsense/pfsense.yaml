@@ -2,16 +2,29 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
   - pfsense--blueprint:connected_host
+  - plugin:cloudify-utilities-plugin
+
+dsl_definitions:
+  openstack_config: &openstack_config
+    username: { get_secret: keystone_username }
+    password: { get_secret: keystone_password }
+    tenant_name: { get_secret: keystone_tenant_name }
+    auth_url: { get_secret: keystone_url }
+    region: { get_secret: region }
+
+inputs:
+  network_deployment_name:
+    description: deployment name of the VNF network
 
 node_templates:
   haproxy:
     type: pfsense--host
     relationships:
-      - type: contained_in
+      - type: cloudify.relationships.connected_to
         target: private_network
-      - type: contained_in
+      - type: cloudify.relationships.connected_to
         target: mgmt_network
-      - type: contained_in
+      - type: cloudify.relationships.connected_to
         target: public_network
 
   openstack:
@@ -20,9 +33,9 @@ node_templates:
       resource_config:
         blueprint:
           id: { get_input: network_deployment_name }
-          blueprint_archive: https://github.com/cloudify-examples/openstack-example-network/archive/master.zip
-          main_file_name: simple-blueprint.yaml
-          external_resource: { get_input: use_existing_network_deployment }
+          blueprint_archive: https://drive.google.com/open?id=19ri_XS-cp2k0aqgpx8A5fJUwPJyGYnB3
+          main_file_name: network_topolgy.yaml
+          external_resource: true
         deployment:
           id: { get_input: network_deployment_name }
           outputs:
@@ -30,7 +43,7 @@ node_templates:
             public_network: public_network
             mgmt_network: mgmt_network
             private_network: private_network
-          external_resource: { get_input: use_existing_network_deployment }
+          external_resource: true
         reexecute: false
 
   private_network:
@@ -62,11 +75,3 @@ node_templates:
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
-
-dsl_definitions:
-  openstack_config: &openstack_config
-    username: { get_secret: keystone_username }
-    password: { get_secret: keystone_password }
-    tenant_name: { get_secret: keystone_tenant_name }
-    auth_url: { get_secret: keystone_url }
-    region: { get_secret: region }
