@@ -17,7 +17,7 @@ inputs:
     description: deployment name of the VNF network
 
 node_templates:
-  haproxy:
+  pfsense:
     type: pfsense--host
     relationships:
       - type: cloudify.relationships.connected_to

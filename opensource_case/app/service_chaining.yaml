@@ -4,4 +4,3 @@ imports:
   - haproxy--blueprint:haproxy
   - pfsense--blueprint:pfsense
   - httpd--blueprint:httpd
-  - network--blueprint:network

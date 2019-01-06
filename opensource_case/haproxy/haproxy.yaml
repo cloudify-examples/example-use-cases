@@ -6,7 +6,7 @@ imports:
 
 inputs:
   network_deployment_name:
-    description: deployment name of the VNF network
+    description: Deployment name of the VNF network
 
 dsl_definitions:
   openstack_config: &openstack_config

@@ -6,7 +6,7 @@ imports:
 
 inputs:
   manager_network:
-    description: manager network
+    description: Management network.
   private_key_path:
     description: >
       The content of the agent's private key.
@@ -26,8 +26,6 @@ inputs:
     default: '2'
   key_pair_name:
     description: key pair name
-  vm_network_list:
-    description: list of connected to network
 
 dsl_definitions:
 
@@ -36,7 +34,7 @@ dsl_definitions:
     password: { get_secret: keystone_password }
     tenant_name: { get_secret: keystone_tenant_name }
     auth_url: { get_secret: keystone_url }
-    region: { get_secret: region }
+    region: { get_secret: keystone_region }
 
 node_types:
   host:
