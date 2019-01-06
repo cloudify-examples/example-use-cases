@@ -10,7 +10,7 @@ dsl_definitions:
     password: { get_secret: keystone_password }
     tenant_name: { get_secret: keystone_tenant_name }
     auth_url: { get_secret: keystone_url }
-    region: { get_secret: region }
+    region: { get_secret: keystone_region }
 
 inputs:
   network_deployment_name:
