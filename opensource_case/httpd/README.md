@@ -1,4 +1,4 @@
-# HTTPD
+# HTTPd
 ## Prerequisite
 ### Network
 If you don't have the networks or wish to deploy all the networks required for this
