@@ -12,56 +12,22 @@ inputs:
     default: cfy
 
   resource_suffix:
-    default: 0
+    default: 2
 
   retry_after:
     type: integer
     default: 60
 
   location:
-    default: westeurope
+    default: { get_capability: [ { get_input: deployment_name }, location ] }
 
   network_api_version:
     description: >
       API Version for Network
     default: "2015-06-15"
 
-  mgmt_subnet_cidr:
-    default: 10.10.1.0/24
-
-  public_subnet_cidr:
-    default: 10.10.2.0/24
-
-  wan_subnet_cidr:
-    default: 10.10.3.0/24
-
-  lan_subnet_cidr:
-    default: 10.10.4.0/24
-
-  network_security_group_rules:
-    default:
-      - name: all_tcp
-        properties:
-          description: All TCP
-          protocol: Tcp
-          sourcePortRange: '*'
-          destinationPortRange: '*'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-          priority: 100
-          access: Allow
-          direction: Inbound
-      - name: all_ucp
-        properties:
-          description: All UDP
-          protocol: Udp
-          sourcePortRange: '*'
-          destinationPortRange: '*'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-          priority: 101
-          access: Allow
-          direction: Inbound
+  deployment_name:
+    default: base-5
 
 dsl_definitions:
 
@@ -77,7 +43,7 @@ node_templates:
     type: cloudify.azure.nodes.ResourceGroup
     properties:
       use_external_resource: true
-      name: { concat: [ { get_input: resource_prefix }, 'resource_group', { get_input: resource_suffix } ] }
+      name: { get_capability: [ { get_input: deployment_name }, resource_group_name ] }
       location: { get_input: location }
       azure_config: *client_config
 
@@ -87,7 +53,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { concat: [ { get_input: resource_prefix }, 'mgmt_network', { get_input: resource_suffix } ] }
+      name: { get_capability: [ { get_input: deployment_name }, virtual_network_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -100,11 +66,9 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { concat: [ { get_input: resource_prefix }, 'mgmt_subnet', { get_input: resource_suffix } ] }
+      name: { get_capability: [ { get_input: deployment_name }, mgmt_subnet_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
-      resource_config:
-        addressPrefix: { get_input: mgmt_subnet_cidr }
     relationships:
     - type: cloudify.azure.relationships.contained_in_virtual_network
       target: virtual_network
@@ -115,11 +79,9 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { concat: [ { get_input: resource_prefix }, 'public_subnet', { get_input: resource_suffix } ] }
+      name: { get_capability: [ { get_input: deployment_name }, public_subnet_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
-      resource_config:
-        addressPrefix: { get_input: public_subnet_cidr }
     relationships:
     - type: cloudify.azure.relationships.contained_in_virtual_network
       target: virtual_network
@@ -130,26 +92,9 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { concat: [ { get_input: resource_prefix }, 'wan_subnet', { get_input: resource_suffix } ] }
+      name: { get_capability: [ { get_input: deployment_name }, wan_subnet_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
-      resource_config:
-        addressPrefix: { get_input: wan_subnet_cidr }
-    relationships:
-    - type: cloudify.azure.relationships.contained_in_virtual_network
-      target: virtual_network
-
-  lan_subnet:
-    type: cloudify.azure.nodes.network.Subnet
-    properties:
-      use_external_resource: true
-      azure_config: *client_config
-      api_version: { get_input: network_api_version }
-      name: { concat: [ { get_input: resource_prefix }, 'lan_subnet', { get_input: resource_suffix } ] }
-      location: { get_input: location }
-      retry_after: { get_input: retry_after }
-      resource_config:
-        addressPrefix: { get_input: lan_subnet_cidr }
     relationships:
     - type: cloudify.azure.relationships.contained_in_virtual_network
       target: virtual_network
@@ -160,11 +105,9 @@ node_templates:
     properties:
       azure_config: *client_config
       use_external_resource: true
-      name: { concat: [ { get_input: resource_prefix }, 'f5_sg', { get_input: resource_suffix } ] }
+      name: { get_capability: [ { get_input: deployment_name }, network_security_group_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
-      resource_config:
-        securityRules: { get_input: network_security_group_rules }
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group

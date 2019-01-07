@@ -12,7 +12,7 @@ inputs:
     default: cfy
 
   resource_suffix:
-    default: 0
+    default: 2
 
   retry_after:
     type: integer
@@ -162,3 +162,19 @@ node_templates:
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
+
+capabilities:
+  resource_group_name:
+    value: { get_attribute: [resource_group, name] }
+  virtual_network_name:
+    value: { get_attribute: [virtual_network, name] }
+  mgmt_subnet_name:
+    value: { get_attribute: [mgmt_subnet, name] }
+  wan_subnet_name:
+    value: { get_attribute: [wan_subnet, name] }
+  public_subnet_name:
+    value: { get_attribute: [public_subnet, name] }
+  network_security_group_name:
+    value: { get_attribute: [network_security_group, name] }
+  location:
+    value: westeurope
