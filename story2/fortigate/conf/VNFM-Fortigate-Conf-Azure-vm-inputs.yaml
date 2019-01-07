@@ -1,0 +1,6 @@
+fortigate_vm_blueprint_name: fortigate-vm-bp
+fortigate_vm_deployment_name: fortigate-vm
+vm_os_username: cloudify
+vm_os_password: Cl0ud1fy!
+portforward_ip: 10.10.4.5
+portforward_port: 55555

@@ -64,7 +64,7 @@ inputs:
   vm_size:
     type: string
     required: true
-    default: Standard_F2s_v2
+    default: Standard_B2s
 
   vm_os_family:
     type: string
@@ -251,6 +251,7 @@ node_templates:
       location: { get_input: location }
       retry_after: { get_input: retry_after }
       primary: true
+      # primary: false
     relationships:
       - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
         target: mgmt_nic_ip_cfg
@@ -258,6 +259,20 @@ node_templates:
         target: resource_group
       - type: cloudify.azure.relationships.nic_connected_to_network_security_group
         target: network_security_group
+
+  # wan_public_ip_address:
+  #   type: cloudify.azure.nodes.network.PublicIPAddress
+  #   properties:
+  #     azure_config:  *azure_config
+  #     use_external_resource: false
+  #     name: { concat: [ { get_input: resource_prefix }, '_mgmtpia', { get_input: resource_suffix } ] }
+  #     location: { get_input: location }
+  #     retry_after: { get_input: retry_after }
+  #     resource_config:
+  #       publicIPAllocationMethod: Static
+  #   relationships:
+  #     - type: cloudify.azure.relationships.contained_in_resource_group
+  #       target: resource_group
 
   wan_nic_ip_cfg:
     type: cloudify.azure.nodes.network.IPConfiguration
@@ -272,6 +287,8 @@ node_templates:
         target: resource_group
       - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
         target: wan_subnet
+      # - type: cloudify.azure.relationships.ip_configuration_connected_to_public_ip
+      #   target: wan_public_ip_address
 
   wan_nic:
     type: cloudify.azure.nodes.network.NetworkInterfaceCard
@@ -279,6 +296,7 @@ node_templates:
       azure_config: *azure_config
       location: { get_input: location }
       retry_after: { get_input: retry_after }
+      # primary: true
       primary: false
     relationships:
       - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
@@ -355,3 +373,8 @@ node_templates:
         target: wan_nic
       - type: cloudify.azure.relationships.connected_to_nic
         target: lan_nic
+
+outputs:
+
+  vm_public_ip_address:
+    value: { get_attribute: [vnf_vm, public_ip_address] }
