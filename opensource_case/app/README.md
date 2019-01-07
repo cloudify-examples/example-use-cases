@@ -21,7 +21,9 @@ A working Cloudify manager and a configured management network and router.
 * keystone_region
 
 ## How to run?
-* Upload to the Cloudify manager the following plugins:
-** OpenStack plugin
-* Upload network topolgy blueprint.
-* Deploy the blueprint with the relevant inputs and secrets and with the deployment id of network.
+* Upload to the Cloudify manager all the required blueprints:
+** HAProxy
+** HTTPD
+** PFSense
+* Upload service_chaining blueprint.
+* Deploy the blueprint with the relevant inputs and secrets.
