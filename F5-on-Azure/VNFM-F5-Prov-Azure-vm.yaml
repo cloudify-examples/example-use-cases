@@ -27,10 +27,10 @@ inputs:
 dsl_definitions:
 
   client_config: &client_config
-    subscription_id: { get_secret: subscription_id }
-    tenant_id: { get_secret: tenant_id }
-    client_id: { get_secret: client_id }
-    client_secret: { get_secret: client_secret }
+    subscription_id: { get_secret: azure_subscription_id }
+    tenant_id: { get_secret: azure_tenant_id }
+    client_id: { get_secret: azure_client_id }
+    client_secret: { get_secret: azure_client_secret }
 
 node_templates:
 

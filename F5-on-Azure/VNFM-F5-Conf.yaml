@@ -103,3 +103,11 @@ node_templates:
 #    relationships:
 #    - type: cloudify.relationships.depends_on
 #      target: license
+
+outputs:
+  bigip_ip:
+    value: { get_input: bigip_ip }
+  public_ip:
+    value: { get_input: public_ip }
+  wan_ip:
+    value: { get_input: wan_ip }

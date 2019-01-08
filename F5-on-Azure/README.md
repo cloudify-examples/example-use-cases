@@ -17,10 +17,10 @@ Create below secrets on secrets store management:
     * *bigip_username* - Username for BIG IP VE, it is set during provisioning and used during configuration,
     * *bigip_password* - Password for BIG IP VE, it is set during provisioning and used during configuration,
 * **Azure secrets:**
-    * *client_id*
-    * *client_secret*
-    * *subscription_id*
-    * *tenant_id*
+    * *azure_client_id*
+    * *azure_client_secret*
+    * *azure_subscription_id*
+    * *azure_tenant_id*
 
 
 
