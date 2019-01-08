@@ -16,26 +16,6 @@ imports:
   - plugin:cloudify-openstack-plugin
 
 inputs:
-  username:
-    description: OS_USERNAME as specified in Openstack RC file.
-    default: { get_secret: keystone_username }
-
-  password:
-    description: Openstack user password.
-    default: { get_secret: keystone_password }
-
-  tenant_name:
-    description: OS_TENANT_NAME as specified in Openstack RC file.
-    default: { get_secret: keystone_tenant_name }
-
-  auth_url:
-    description: OS_AUTH_URL as specified in Openstack RC file.
-    default: { get_secret: keystone_url }
-
-  region:
-    description: OS_REGION_NAME as specified in Openstack RC file.
-    default: { get_secret: region }
-
   external_network_name:
     description: Openstack tenant external network name.
 
