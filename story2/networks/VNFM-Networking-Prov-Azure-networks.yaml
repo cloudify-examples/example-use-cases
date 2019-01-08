@@ -200,7 +200,7 @@ node_templates:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
 
-outputs:
+capabilities:
 
   resource_group:
     value: { get_attribute: [ resource_group, name ] }
@@ -221,7 +221,4 @@ outputs:
     value: { get_attribute: [ lan_subnet, name ] }
 
   network_security_group:
-    value: { get_attribute: [network_security_group, name] }
-
-  location:
-    value: { get_input: location }
+    value: { get_attribute: [ network_security_group, name ] }

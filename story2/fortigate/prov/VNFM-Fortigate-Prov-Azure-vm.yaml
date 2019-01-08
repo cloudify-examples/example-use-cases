@@ -3,7 +3,6 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
   - plugin:cloudify-azure-plugin
-  - plugin:cloudify-utilities-plugin
 
 inputs:
   subscription_id:
@@ -52,10 +51,6 @@ inputs:
   endpoints_active_directory:
     type: string
     default: https://login.microsoftonline.com
-
-  azure_network_blueprint_name:
-    type: string
-    default: azure-networks-bp
 
   azure_network_deployment_name:
     type: string
@@ -121,35 +116,12 @@ dsl_definitions:
 
 node_templates:
 
-  common_resources:
-    type: cloudify.nodes.DeploymentProxy
-    properties:
-      resource_config:
-        blueprint:
-          id: { get_input: azure_network_blueprint_name }
-          external_resource: true
-        deployment:
-          id: { get_input: azure_network_deployment_name }
-          outputs:
-            resource_group: resource_group
-            virtual_network: virtual_network
-            mgmt_subnet: mgmt_subnet
-            wan_subnet: wan_subnet
-            lan_subnet: lan_subnet
-            network_security_group: network_security_group
-            location: location
-          external_resource: true
-        reexecute: false
-
   resource_group:
     type: cloudify.azure.nodes.ResourceGroup
     properties:
       azure_config: *azure_config
-      name: { get_attribute: [common_resources, deployment, outputs, resource_group] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, resource_group ] }
       use_external_resource: true
-    relationships:
-      - type: cloudify.relationships.depends_on
-        target: common_resources
 
   storage_account:
     type: cloudify.azure.nodes.storage.StorageAccount
@@ -169,7 +141,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       use_external_resource: true
-      name: { get_attribute: [ common_resources, deployment, outputs, virtual_network ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, virtual_network] }
     relationships:
       - type: cloudify.azure.relationships.contained_in_resource_group
         target: resource_group
@@ -179,7 +151,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       use_external_resource: true
-      name: { get_attribute: [ common_resources, deployment, outputs, mgmt_subnet ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, mgmt_subnet] }
     relationships:
       - type: cloudify.azure.relationships.contained_in_virtual_network
         target: virtual_network
@@ -189,7 +161,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       use_external_resource: true
-      name: { get_attribute: [ common_resources, deployment, outputs, wan_subnet ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, wan_subnet] }
     relationships:
       - type: cloudify.azure.relationships.contained_in_virtual_network
         target: virtual_network
@@ -199,7 +171,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       use_external_resource: true
-      name: { get_attribute: [ common_resources, deployment, outputs, lan_subnet ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, lan_subnet] }
     relationships:
       - type: cloudify.azure.relationships.contained_in_virtual_network
         target: virtual_network
@@ -209,7 +181,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       use_external_resource: true
-      name: { get_attribute: [ common_resources, deployment, outputs, network_security_group ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, network_security_group] }
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
@@ -251,7 +223,6 @@ node_templates:
       location: { get_input: location }
       retry_after: { get_input: retry_after }
       primary: true
-      # primary: false
     relationships:
       - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
         target: mgmt_nic_ip_cfg
@@ -259,20 +230,6 @@ node_templates:
         target: resource_group
       - type: cloudify.azure.relationships.nic_connected_to_network_security_group
         target: network_security_group
-
-  # wan_public_ip_address:
-  #   type: cloudify.azure.nodes.network.PublicIPAddress
-  #   properties:
-  #     azure_config:  *azure_config
-  #     use_external_resource: false
-  #     name: { concat: [ { get_input: resource_prefix }, '_mgmtpia', { get_input: resource_suffix } ] }
-  #     location: { get_input: location }
-  #     retry_after: { get_input: retry_after }
-  #     resource_config:
-  #       publicIPAllocationMethod: Static
-  #   relationships:
-  #     - type: cloudify.azure.relationships.contained_in_resource_group
-  #       target: resource_group
 
   wan_nic_ip_cfg:
     type: cloudify.azure.nodes.network.IPConfiguration
@@ -287,8 +244,6 @@ node_templates:
         target: resource_group
       - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
         target: wan_subnet
-      # - type: cloudify.azure.relationships.ip_configuration_connected_to_public_ip
-      #   target: wan_public_ip_address
 
   wan_nic:
     type: cloudify.azure.nodes.network.NetworkInterfaceCard
@@ -296,7 +251,6 @@ node_templates:
       azure_config: *azure_config
       location: { get_input: location }
       retry_after: { get_input: retry_after }
-      # primary: true
       primary: false
     relationships:
       - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
@@ -374,7 +328,7 @@ node_templates:
       - type: cloudify.azure.relationships.connected_to_nic
         target: lan_nic
 
-outputs:
+capabilities:
 
   vm_public_ip_address:
     value: { get_attribute: [vnf_vm, public_ip_address] }

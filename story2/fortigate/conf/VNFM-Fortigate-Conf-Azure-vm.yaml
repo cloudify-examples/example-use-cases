@@ -6,10 +6,6 @@ imports:
 
 inputs:
 
-  fortigate_vm_blueprint_name:
-    type: string
-    default: fortigate-vm-bp
-
   fortigate_vm_deployment_name:
     type: string
     default: fortigate-vm
@@ -28,32 +24,25 @@ inputs:
     required: true
     default: Cl0ud1fy!
 
-  portforward_ip:
+  wan_ip:
     type: string
     description: >
-      IP address of PRIVATE host
-    default: '192.168.20.6'
+      IP address of WAN interface
+    default: '10.10.3.4'
 
-  portforward_port:
+  wan_port:
     type: string
     description: >
       Port on which service is going to be exposed
     default: '55555'
 
-node_templates:
+  lan_ip:
+    type: string
+    description: >
+      IP address of LAN host
+    default: '10.10.4.5'
 
-  fortigate_vnf_deployment:
-    type: cloudify.nodes.DeploymentProxy
-    properties:
-      resource_config:
-        blueprint:
-          id: { get_input: fortigate_vm_blueprint_name }
-          external_resource: true
-        deployment:
-          id: { get_input: fortigate_vm_deployment_name }
-          external_resource: true
-          outputs:
-            vm_public_ip_address: vm_public_ip_address
+node_templates:
 
   fortigate_vnf_config:
     type: cloudify.terminal.raw
@@ -64,7 +53,7 @@ node_templates:
             terminal_auth: &terminal_auth
               user: { get_input: vm_os_username }
               password: { get_input: vm_os_password }
-              ip: { get_attribute: [fortigate_vnf_deployment, deployment, outputs, vm_public_ip_address] }
+              ip: { get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }
               promt_check:
                 - '#'
                 - '$'
@@ -83,13 +72,11 @@ node_templates:
             calls:
               - template: templates/fortigate-portforward-start.txt
                 params:
-                  PORTFORWARD_IP: { get_input: portforward_ip }
-                  PORTFORWARD_PORT: { get_input: portforward_port }
+                  PORTFORWARD_IP: { get_input: lan_ip }
+                  PORTFORWARD_PORT: { get_input: wan_port }
+                  EXTERNAL_IP: { get_input: wan_ip }
         stop:
           inputs:
             terminal_auth: *terminal_auth
             calls:
               - template: templates/fortigate-portforward-stop.txt
-    relationships:
-      - type: cloudify.relationships.depends_on
-        target: fortigate_vnf_deployment
