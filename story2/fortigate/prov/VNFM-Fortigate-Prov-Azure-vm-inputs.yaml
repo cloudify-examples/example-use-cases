@@ -8,7 +8,7 @@ endpoint_verify: True
 endpoint_storage: core.windows.net
 location: { get_secret: azure_location }
 retry_after: 5
-resource_prefix: jaroslaw
+resource_prefix: cfy
 resource_suffix: 0
 endpoints_active_directory: https://login.microsoftonline.com
 azure_network_deployment_name: azure-networks

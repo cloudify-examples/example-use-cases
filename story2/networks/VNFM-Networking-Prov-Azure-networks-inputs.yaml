@@ -9,7 +9,7 @@ endpoint_storage: core.windows.net
 endpoints_active_directory: https://login.microsoftonline.com
 location: { get_secret: azure_location }
 retry_after: 5
-resource_prefix: jaroslaw
+resource_prefix: cfy
 resource_suffix: 0
 mgmt_subnet_cidr: 10.10.1.0/24
 public_subnet_cidr: 10.10.2.0/24
