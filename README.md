@@ -34,7 +34,9 @@ Install those using ``networks/VNFM-Networking-Prov-Azure-networks.yaml`` bluepr
 ``networks/VNFM-Networking-Prov-Azure-networks-inputs.yaml`` file:
 
 ``cfy blueprints upload -b azure-networks-bp networks/VNFM-Networking-Prov-Azure-networks.yaml``
+
 ``cfy deployment create -b azure-networks-bp -i networks/VNFM-Networking-Prov-Azure-networks-inputs.yaml azure-networks``
+
 ``cfy executions start -d azure-networks install``
 
 ### FortiGate NGFW Single VM provisioning
@@ -43,7 +45,9 @@ Resources created in Prerequesites subsection are fetched using capabilities exp
 To provision FortiGate NGFW Single VM:
 
 ``cfy blueprints upload -b fortigate-vm-bp fortigate/prov/VNFM-Fortigate-Prov-Azure-vm.yaml``
+
 ``cfy deployment create -b fortigate-vm-bp -i fortigate/prov/VNFM-Fortigate-Prov-Azure-vm-inputs.yaml fortigate-vm``
+
 ``cfy executions start -d fortigate-vm install``
 
 ## Configuration
@@ -58,7 +62,9 @@ and follow the instructions to apply the license.
 ``VNFM-Fortigate-Conf-Azure-vm.yaml`` is responsible for applying the configuration for newly created FortiGate VM. It configures all of the interfaces and prepares NAT rules and policies, which are required to perform the service chain.
 
 ``cfy blueprints upload -b fortigate-pf-bp fortigate/conf/VNFM-Fortigate-Conf-Azure-vm.yaml``
+
 ``cfy deployment create -b fortigate-pf-bp -i fortigate/prov/VNFM-Fortigate-Conf-Azure-vm-inputs.yaml fortigate-pf``
+
 ``cfy executions start -d fortigate-pf install``
 
 ### Uninstall
