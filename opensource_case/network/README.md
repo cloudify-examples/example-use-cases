@@ -5,7 +5,7 @@ The management network and the central router needs to be exisiting.
 ### Cloudify manager
 A working Cloudify manager and a configured management network and router.
 ### Inputs
-* external_network_name - Openstack tenant external network name.
+* external_network_name - OpenStack tenant external network name.
 * nameservers - IP addresses of DNS nameservers.
 * public_subnet_cidr
 * public_subnet_application_pool
@@ -22,6 +22,6 @@ A working Cloudify manager and a configured management network and router.
 
 ## How to run?
 * Upload to the Cloudify manager the following plugins:
-** OpenStack plugin
+ * OpenStack plugin.
 * Upload network topolgy blueprint.
-* Deploy the blueprint with the relevant inputs and secrets and with the deployment id of network.
+* Deploy the blueprint with the relevant inputs and secrets, and set the deployment id to "network".
