@@ -33,7 +33,7 @@ node_templates:
       resource_config:
         blueprint:
           id: { get_input: network_deployment_name }
-          blueprint_archive: https://drive.google.com/open?id=19ri_XS-cp2k0aqgpx8A5fJUwPJyGYnB3
+          blueprint_archive: https://github.com/cloudify-examples/example-use-cases/blob/master/opensource_case/network.zip
           main_file_name: network_topolgy.yaml
           external_resource: true
         deployment:
