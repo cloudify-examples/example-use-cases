@@ -1,0 +1,42 @@
+config firewall vip
+    edit "sg-port-forward-vip"
+        set extintf "port2"
+        set portforward enable
+        set mappedip "{{PORTFORWARD_IP}}"
+        set extport {{PORTFORWARD_PORT}}
+        set mappedport 8080
+    next
+    edit "sg-outgoing-vip"
+        set extip {{PORTFORWARD_IP}}
+        set extintf "port3"
+        set mappedip {{EXTERNAL_IP}}
+    next
+end
+config firewall policy
+    edit 1
+        set name "sg-port-forward-policy"
+        set srcintf "port2"
+        set dstintf "port3"
+        set srcaddr "all"
+        set dstaddr "sg-port-forward-vip"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set logtraffic-start enable
+        set nat enable
+    next
+    edit 2
+        set name "sg-outgoing-policy"
+        set srcintf "port3"
+        set dstintf "port2"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set logtraffic-start enable
+        set nat enable
+    next
+end

@@ -1,0 +1,82 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  fortigate_vm_deployment_name:
+    type: string
+    default: fortigate-vm
+
+  vm_os_username:
+    description: >
+      Username to create as the VM's administrator user
+    type: string
+    required: true
+    default: cloudify
+
+  vm_os_password:
+    description: >
+      Password to use for the VM's administrator user
+    type: string
+    required: true
+    default: Cl0ud1fy!
+
+  wan_ip:
+    type: string
+    description: >
+      IP address of WAN interface
+    default: '10.10.3.4'
+
+  wan_port:
+    type: string
+    description: >
+      Port on which service is going to be exposed
+    default: '55555'
+
+  lan_ip:
+    type: string
+    description: >
+      IP address of LAN host
+    default: '10.10.4.5'
+
+node_templates:
+
+  fortigate_vnf_config:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            terminal_auth: &terminal_auth
+              user: { get_input: vm_os_username }
+              password: { get_input: vm_os_password }
+              ip: { get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }
+              promt_check:
+                - '#'
+                - '$'
+              errors:
+                - "Command fail."
+            calls:
+              - action: exit
+        configure:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: templates/fortigate-baseline.txt
+        start:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: templates/fortigate-portforward-start.txt
+                params:
+                  PORTFORWARD_IP: { get_input: lan_ip }
+                  PORTFORWARD_PORT: { get_input: wan_port }
+                  EXTERNAL_IP: { get_input: wan_ip }
+        stop:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: templates/fortigate-portforward-stop.txt

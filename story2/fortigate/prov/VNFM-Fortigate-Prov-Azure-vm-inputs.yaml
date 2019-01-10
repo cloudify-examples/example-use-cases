@@ -1,0 +1,23 @@
+subscription_id: { get_secret: azure_subscription_id }
+tenant_id: { get_secret: azure_tenant_id }
+client_id: { get_secret: azure_client_id }
+client_secret: { get_secret: azure_client_secret }
+endpoint_resource: https://management.core.windows.net/
+endpoints_resource_manager: https://management.azure.com
+endpoint_verify: True
+endpoint_storage: core.windows.net
+location: { get_secret: azure_location }
+retry_after: 5
+resource_prefix: cfy
+resource_suffix: 0
+endpoints_active_directory: https://login.microsoftonline.com
+azure_network_deployment_name: azure-networks
+vm_size: Standard_B2s
+vm_os_family: linux
+vm_image_publisher: fortinet
+vm_image_offer: fortinet_fortigate-vm_v5
+vm_image_sku: fortinet_fg-vm
+vm_image_version: 6.0.3
+vm_os_username: cloudify
+vm_os_password: Cl0ud1fy!
+vnf_vm_name: fortigatevm
