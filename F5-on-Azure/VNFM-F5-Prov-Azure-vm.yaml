@@ -1,0 +1,103 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Create an instance of BIG-IP on Azure.
+
+imports:
+  - Resources/blueprints/nics.yaml
+
+inputs:
+
+  virtual_machine_size:
+    default: Standard_A7
+
+  vm_name:
+    default: F5LoadBalancer2
+
+  virtual_machine_image_sku:
+    default: 'f5-big-all-1slot-byol'
+
+  virtual_machine_image_publisher:
+    default: 'f5-networks'
+
+  virtual_machine_image_offer:
+    default: 'f5-big-ip-byol'
+
+
+dsl_definitions:
+
+  client_config: &client_config
+    subscription_id: { get_secret: azure_subscription_id }
+    tenant_id: { get_secret: azure_tenant_id }
+    client_id: { get_secret: azure_client_id }
+    client_secret: { get_secret: azure_client_secret }
+
+node_templates:
+
+  virtual_machine:
+    type: cloudify.azure.nodes.compute.VirtualMachine
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: {get_input: vm_name}
+      location: { get_input: location }
+      os_family: linux
+      agent_config:
+        install_method: none
+      plan:
+        name: { get_input: virtual_machine_image_sku }
+        publisher: { get_input: virtual_machine_image_publisher }
+        product: { get_input: virtual_machine_image_offer }
+      resource_config:
+        hardwareProfile:
+          vmSize: { get_input: virtual_machine_size }
+        storageProfile:
+          imageReference:
+            publisher: { get_input: virtual_machine_image_publisher }
+            offer: { get_input: virtual_machine_image_offer }
+            sku: { get_input: virtual_machine_image_sku }
+            version: latest
+        osProfile:
+          computerName: { get_property: [SELF, name] }
+          adminUsername: { get_secret: bigip_username }
+          adminPassword: { get_secret: bigip_password }
+    relationships:
+    - type: cloudify.azure.relationships.contained_in_resource_group
+      target: resource_group
+    - type: cloudify.azure.relationships.connected_to_storage_account
+      target: storage_account
+    - type: cloudify.azure.relationships.connected_to_nic
+      target: wan_nic
+    - type: cloudify.azure.relationships.connected_to_nic
+      target: public_nic
+    - type: cloudify.azure.relationships.connected_to_nic
+      target: mgmt_nic
+
+
+  storage_account:
+    type: cloudify.azure.nodes.storage.StorageAccount
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ {get_input: vm_name}, 'sa0' ] }
+      location: { get_input: location }
+      resource_config:
+        accountType: Standard_LRS
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+capabilities:
+  mgmt_nic:
+    value:
+      name: { get_attribute: [mgmt_nic, name] }
+      ip: { get_attribute: [virtual_machine, ip] }
+      public_ip: { get_attribute: [virtual_machine, public_ip] }
+  wan_nic:
+    value:
+      name: { get_attribute: [wan_nic, name] }
+  public_nic:
+    value:
+      name: { get_attribute: [public_nic, name] }
+  vm_name:
+    value: { get_attribute: [virtual_machine, name] }

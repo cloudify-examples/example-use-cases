@@ -1,0 +1,180 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Creates: Resource group, security group, network and 4 subnets.
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
+  - plugin:cloudify-azure-plugin
+
+inputs:
+  resource_prefix:
+    default: cfy
+
+  resource_suffix:
+    default: 2
+
+  retry_after:
+    type: integer
+    default: 60
+
+  location:
+    default: westeurope
+
+  network_api_version:
+    description: >
+      API Version for Network
+    default: "2015-06-15"
+
+  mgmt_subnet_cidr:
+    default: 10.10.1.0/24
+
+  public_subnet_cidr:
+    default: 10.10.2.0/24
+
+  wan_subnet_cidr:
+    default: 10.10.3.0/24
+
+  lan_subnet_cidr:
+    default: 10.10.4.0/24
+
+  network_security_group_rules:
+    default:
+      - name: all_tcp
+        properties:
+          description: All TCP
+          protocol: Tcp
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          priority: 100
+          access: Allow
+          direction: Inbound
+      - name: all_ucp
+        properties:
+          description: All UDP
+          protocol: Udp
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          priority: 101
+          access: Allow
+          direction: Inbound
+
+dsl_definitions:
+
+  client_config: &client_config
+    subscription_id: { get_secret: azure_subscription_id }
+    tenant_id: { get_secret: azure_tenant_id }
+    client_id: { get_secret: azure_client_id }
+    client_secret: { get_secret: azure_client_secret }
+
+node_templates:
+
+  resource_group:
+    type: cloudify.azure.nodes.ResourceGroup
+    properties:
+      name: { concat: [ { get_input: resource_prefix }, 'resource_group', { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      azure_config: *client_config
+
+  virtual_network:
+    type: cloudify.azure.nodes.network.VirtualNetwork
+    properties:
+      azure_config: *client_config
+      api_version: { get_input: network_api_version }
+      name: { concat: [ { get_input: resource_prefix }, 'mgmt_network', { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  mgmt_subnet:
+    type: cloudify.azure.nodes.network.Subnet
+    properties:
+      azure_config: *client_config
+      api_version: { get_input: network_api_version }
+      name: { concat: [ { get_input: resource_prefix }, 'mgmt_subnet', { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        addressPrefix: { get_input: mgmt_subnet_cidr }
+    relationships:
+    - type: cloudify.azure.relationships.contained_in_virtual_network
+      target: virtual_network
+
+  public_subnet:
+    type: cloudify.azure.nodes.network.Subnet
+    properties:
+      azure_config: *client_config
+      api_version: { get_input: network_api_version }
+      name: { concat: [ { get_input: resource_prefix }, 'public_subnet', { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        addressPrefix: { get_input: public_subnet_cidr }
+    relationships:
+    - type: cloudify.azure.relationships.contained_in_virtual_network
+      target: virtual_network
+
+  wan_subnet:
+    type: cloudify.azure.nodes.network.Subnet
+    properties:
+      azure_config: *client_config
+      api_version: { get_input: network_api_version }
+      name: { concat: [ { get_input: resource_prefix }, 'wan_subnet', { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        addressPrefix: { get_input: wan_subnet_cidr }
+    relationships:
+    - type: cloudify.azure.relationships.contained_in_virtual_network
+      target: virtual_network
+
+  lan_subnet:
+    type: cloudify.azure.nodes.network.Subnet
+    properties:
+      azure_config: *client_config
+      api_version: { get_input: network_api_version }
+      name: { concat: [ { get_input: resource_prefix }, 'lan_subnet', { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        addressPrefix: { get_input: lan_subnet_cidr }
+    relationships:
+    - type: cloudify.azure.relationships.contained_in_virtual_network
+      target: virtual_network
+
+  #Security group
+  network_security_group:
+    type: cloudify.azure.nodes.network.NetworkSecurityGroup
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'f5_sg', { get_input: resource_suffix } ] }
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        securityRules: { get_input: network_security_group_rules }
+    relationships:
+    - type: cloudify.azure.relationships.contained_in_resource_group
+      target: resource_group
+
+capabilities:
+  resource_group_name:
+    value: { get_attribute: [resource_group, name] }
+  virtual_network_name:
+    value: { get_attribute: [virtual_network, name] }
+  mgmt_subnet_name:
+    value: { get_attribute: [mgmt_subnet, name] }
+  wan_subnet_name:
+    value: { get_attribute: [wan_subnet, name] }
+  public_subnet_name:
+    value: { get_attribute: [public_subnet, name] }
+  network_security_group_name:
+    value: { get_attribute: [network_security_group, name] }
+  location:
+    value: westeurope
