@@ -1,3 +1,4 @@
+create ltm pool sg-pool
 create ltm node app-node-1 address {{APP_NODE_1_IP}}
 create ltm pool sg-pool members add { app-node-1:{{APP_NODE_1_PORT}} }
 modify ltm pool sg-pool monitor http

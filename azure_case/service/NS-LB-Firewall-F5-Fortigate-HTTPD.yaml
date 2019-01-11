@@ -1,7 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 description: >
-  Create an instance of BIG-IP on Azure.
+  Creating load balancing rule on BIG-IP LTM to allow traffic forwarding
 
 imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
@@ -61,7 +61,7 @@ node_templates:
                 params:
                   APP_NODE_1_IP: { get_input: fw_wan_ip }
                   APP_NODE_1_PORT: { get_input: fw_wan_port }
-                  DESTINATION_IP: { get_input: lb_publi_ip }
+                  DESTINATION_IP: { get_input: lb_public_ip }
                   DESTINATION_PORT: { get_input: lb_public_port }
         stop:
           inputs:

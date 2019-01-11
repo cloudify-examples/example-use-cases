@@ -22,8 +22,6 @@ Create below secrets on secrets store management:
     * *azure_subscription_id*
     * *azure_tenant_id*
 
-
-
 ## Provisioning 
 
 VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine connected to 2 networks:
@@ -33,16 +31,15 @@ VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine
 ### Prerequesites
 
 Before installation of VNFM-HTTPD-Prov-Azure-vm.yaml, suitable resource group, networks and security group have to be created.
-Install those using networks.yaml blueprint:
-
-``cfy install  VNFM-Networking-Prov-Azure-networks.yaml -b  VNFM-Networking-Prov-Azure-networks``
+Go to *common* directory and install blueprint as described in readme file.
+It should be installed only one time before start of provisioning services.
 
 ### HTTPD provisioning
 
 Resources created in Prerequesites subsection are fetched using capabilities mechnism.
 To provision HTTPD:
 
-``cfy install VNFM-HTTPD-Prov-Azure-vm.yaml -b VNFM-HTTPD-Prov-Azure``
+``cfy install VNFM-HTTPD-Prov-Azure-vm.yaml -b VNFM-HTTPD-Prov-Azure-vm``
 
 
 ## Configuration

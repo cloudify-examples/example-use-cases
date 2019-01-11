@@ -22,8 +22,6 @@ Create below secrets on secrets store management:
     * *azure_subscription_id*
     * *azure_tenant_id*
 
-
-
 ## Provisioning 
 
 VNFM-F5-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine connected to 3 networks:
@@ -34,16 +32,15 @@ VNFM-F5-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine co
 ### Prerequesites
 
 Before installation of VNFM-F5-Prov-Azure-vm.yaml, suitable resource group, networks and security group have to be created.
-Install those using networks.yaml blueprint:
-
-``cfy install networks.yaml -b base``
+Go to *common* directory and install blueprint as described in readme file.
+It should be installed only one time before start of provisioning services.
 
 ### BIG-IP provisioning
 
 Resources created in Prerequesites subsection are fetched using existing_networks.yaml blueprint and VNFM-F5-Prov-Azure-vm.yaml is using it.
 To provision BIG-IP:
 
-``cfy install VNFM-F5-Prov-Azure-vm.yaml -b VNFM-F5-Prov-Azure``
+``cfy install VNFM-F5-Prov-Azure-vm.yaml -b VNFM-F5-Prov-Azure-vm``
 
 
 ## Configuration
@@ -52,7 +49,7 @@ To provision BIG-IP:
 VNFM-F5-Conf.yaml is responsible for licensing BIG IP with provided registration key (bigip_license_key input).
 Additionally VLAN configuration necessary for further LTM configuration is applied.
 
-``cfy install VNFM-F5-Conf.yaml -b f5-conf``
+``cfy install VNFM-F5-Conf.yaml -b VNFM-F5-Conf``
 
 ### Uninstall
 During uninstall the license is revoked so it can be used on different BIG IP VE or on the same one again.
