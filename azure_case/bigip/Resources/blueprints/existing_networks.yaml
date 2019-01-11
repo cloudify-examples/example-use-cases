@@ -19,15 +19,21 @@ inputs:
     default: 60
 
   location:
-    default: { get_capability: [ { get_input: deployment_name }, location ] }
+    default: westeurope
 
   network_api_version:
     description: >
       API Version for Network
     default: "2015-06-15"
 
-  deployment_name:
+  azure_network_deployment_name:
     default: base-5
+
+  resource_prefix:
+    default: cfy
+
+  resource_suffix:
+    default: 0
 
 dsl_definitions:
 
@@ -38,14 +44,12 @@ dsl_definitions:
     client_secret: { get_secret: azure_client_secret }
 
 node_templates:
-
   resource_group:
     type: cloudify.azure.nodes.ResourceGroup
     properties:
-      use_external_resource: true
-      name: { get_capability: [ { get_input: deployment_name }, resource_group_name ] }
-      location: { get_input: location }
       azure_config: *client_config
+      name: { concat: [ { get_input: resource_prefix }, '_resource_group', { get_input: resource_suffix } ] }
+      location: { get_input: location }
 
   virtual_network:
     type: cloudify.azure.nodes.network.VirtualNetwork
@@ -53,7 +57,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { get_capability: [ { get_input: deployment_name }, virtual_network_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, virtual_network_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -66,7 +70,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { get_capability: [ { get_input: deployment_name }, mgmt_subnet_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, mgmt_subnet_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -79,7 +83,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { get_capability: [ { get_input: deployment_name }, public_subnet_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, public_subnet_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -92,7 +96,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { get_capability: [ { get_input: deployment_name }, wan_subnet_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, wan_subnet_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -105,7 +109,7 @@ node_templates:
     properties:
       azure_config: *client_config
       use_external_resource: true
-      name: { get_capability: [ { get_input: deployment_name }, network_security_group_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, network_security_group_name ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:

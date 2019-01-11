@@ -54,7 +54,7 @@ inputs:
 
   azure_network_deployment_name:
     type: string
-    default: azure-networks
+    default: VNFM-Networking-Prov-Azure-networks
 
   vm_size:
     type: string
@@ -79,7 +79,7 @@ inputs:
   vm_image_sku:
     type: string
     required: true
-    default: fortinet_fg-vm_payg
+    default:  fortinet_fg-vm
 
   vm_image_version:
     type: string
@@ -102,6 +102,7 @@ inputs:
 
   vnf_vm_name:
     type: string
+    default: fortigatevm
 
 dsl_definitions:
   azure_config: &azure_config
