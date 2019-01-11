@@ -51,7 +51,7 @@ and follow the instructions to apply the license.
 ### Install
 ``VNFM-Fortigate-Conf.yaml`` is responsible for applying the configuration for newly created FortiGate VM. It configures all of the interfaces and prepares NAT rules and policies, which are required to perform the service chain.
 
-``cfy install VNFM-Fortigate-Conf-Azure.yaml -b VNFM-Fortigate-Conf``
+``cfy install VNFM-Fortigate-Conf.yaml -b VNFM-Fortigate-Conf``
 
 ### Uninstall
 During uninstall, all of the NAT rules and policies are being deleted.
