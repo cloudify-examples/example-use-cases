@@ -28,7 +28,6 @@ inputs:
     type: string
     description: >
       IP address of WAN interface
-    default: '10.10.3.4'
 
   wan_port:
     type: string
@@ -40,7 +39,6 @@ inputs:
     type: string
     description: >
       IP address of LAN host
-    default: '10.10.4.5'
 
 node_templates:
 

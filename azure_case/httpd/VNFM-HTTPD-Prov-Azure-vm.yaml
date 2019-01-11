@@ -205,7 +205,6 @@ node_templates:
       - type: cloudify.azure.relationships.contained_in_resource_group
         target: resource_group
 
-
 # lan
   lan_security_group:
     type: cloudify.azure.nodes.network.NetworkSecurityGroup
@@ -222,6 +221,17 @@ node_templates:
             protocol: Tcp
             sourcePortRange: '*'
             destinationPortRange: 80
+            sourceAddressPrefix: '*'
+            destinationAddressPrefix: '*'
+            priority: 104
+            access: Allow
+            direction: Inbound
+        - name: sg_http_8080
+          properties:
+            description: HTTP access
+            protocol: Tcp
+            sourcePortRange: '*'
+            destinationPortRange: 8080
             sourceAddressPrefix: '*'
             destinationAddressPrefix: '*'
             priority: 103
