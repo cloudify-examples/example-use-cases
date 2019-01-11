@@ -10,8 +10,9 @@ imports:
 inputs:
   bigip_license_key:
     default: XNFZK-ZGOJN-WLVPO-LFUPL-SUWZDMU
+
   prov_deployment_name:
-    default: f5-prov-azure-5
+    default: /VNFM-F5-Prov-Azure-vm
 
   bigip_ip:
     default: { get_capability: [ {get_input: prov_deployment_name}, mgmt_nic, public_ip ] }
@@ -79,30 +80,6 @@ node_templates:
     relationships:
     - type: cloudify.relationships.depends_on
       target: license
-
-  #For service blueprint
-#  ltm_config:
-#    type: cloudify.terminal.raw
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        start:
-#          inputs:
-#            terminal_auth: *terminal_auth
-#            calls:
-#              - template: Resources/templates/ltm_config.txt
-#                params:
-#                  APP_NODE_1_IP: { get_input: app_node_1_ip } #App server IP (In our case it will be from WAN network)
-#                  APP_NODE_1_PORT: { get_input: app_node_1_port } #ie 8080
-#                  DESTINATION_IP: { get_attribute: [f5_baseline_vnf_deployment, deployment, outputs, outside_ip ] } # public ip
-#                  DESTINATION_PORT: { get_input: destination_port } # new port for app
-#        stop:
-#          inputs:
-#            terminal_auth: *terminal_auth
-#            calls:
-#              - template: Resources/templates/ltm_config_stop.txt
-#    relationships:
-#    - type: cloudify.relationships.depends_on
-#      target: license
 
 outputs:
   bigip_ip:
