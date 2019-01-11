@@ -27,7 +27,7 @@ inputs:
     default: "2015-06-15"
 
   azure_network_deployment_name:
-    default: base-5
+    default: VNFM-Networking-Prov-Azure-networks
 
   resource_prefix:
     default: cfy
@@ -57,7 +57,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { get_capability: [ { get_input: azure_network_deployment_name }, virtual_network_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, virtual_network] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -70,7 +70,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { get_capability: [ { get_input: azure_network_deployment_name }, mgmt_subnet_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, mgmt_subnet] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -83,7 +83,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { get_capability: [ { get_input: azure_network_deployment_name }, public_subnet_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, public_subnet] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -96,7 +96,7 @@ node_templates:
       use_external_resource: true
       azure_config: *client_config
       api_version: { get_input: network_api_version }
-      name: { get_capability: [ { get_input: azure_network_deployment_name }, wan_subnet_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, wan_subnet] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
@@ -109,7 +109,7 @@ node_templates:
     properties:
       azure_config: *client_config
       use_external_resource: true
-      name: { get_capability: [ { get_input: azure_network_deployment_name }, network_security_group_name ] }
+      name: { get_capability: [ { get_input: azure_network_deployment_name }, network_security_group ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
