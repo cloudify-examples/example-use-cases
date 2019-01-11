@@ -48,8 +48,9 @@ node_templates:
     type: cloudify.azure.nodes.ResourceGroup
     properties:
       azure_config: *client_config
-      name: { concat: [ { get_input: resource_prefix }, '_resource_group', { get_input: resource_suffix } ] }
+      name: {get_capability: [{ get_input: azure_network_deployment_name }, resource_group] }
       location: { get_input: location }
+      use_external_resource: true
 
   virtual_network:
     type: cloudify.azure.nodes.network.VirtualNetwork
