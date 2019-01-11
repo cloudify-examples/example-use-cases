@@ -15,7 +15,7 @@ Upload:
 Create below secrets on secrets store management:
 * **BIG-IP secrets:**
     * *bigip_username* - Username for BIG IP VE, it is set during provisioning and used during configuration,
-    * *bigip_password* - Password for BIG IP VE, it is set during provisioning and used during configuration,
+    * *bigip_password* - Password for BIG IP VE, it is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special characterr. Control characters are not allowed
 * **Azure secrets:**
     * *azure_client_id*
     * *azure_client_secret*
