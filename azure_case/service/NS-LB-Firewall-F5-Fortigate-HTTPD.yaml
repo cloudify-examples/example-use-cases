@@ -23,6 +23,7 @@ inputs:
     description: >
       TCP port on which the service is exposed on Firewall
     type: integer
+    default: 8080
 
   lb_public_ip:
     description: >
@@ -33,6 +34,7 @@ inputs:
     description: >
       Load balancer public network port on which service is exposed 
     type: integer
+    default: 8080
 
 dsl_definitions:
 
