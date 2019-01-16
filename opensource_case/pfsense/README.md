@@ -39,7 +39,7 @@ REST call to FauxAPI (a REST api for pfSense).
 * FauxAPI api_secret
 
 ### How to run?
-* Upload Cloudify Utilities plugin to the Cloudify Manager. The plugin provides a generic type in a blueprint in order to integrate with REST based systems. Get it here.
+* Upload Cloudify Utilities plugin to the Cloudify Manager. The plugin provides a generic type in a blueprint in order to integrate with REST based systems. Get it here https://cloudify.co/plugins.
 * Create a .json file that contains the pfSense configuration changes and store it under the blueprint’s resources.. Please note that the this blueprint uses the `patch` command - it will only update the existing configuration and not replace it).
 * The blueprint directory should look like this:
 <blueprint_root_dir>/
@@ -47,7 +47,7 @@ REST call to FauxAPI (a REST api for pfSense).
 	scripts/
 		create_faux_auth_token.sh
 	resources/
-		Config.json
+		config.json
 templates/
 		config_patch_template.yaml
 * The config_patch_template.yaml contains a template of the REST call that will be performed, it can be modified.
