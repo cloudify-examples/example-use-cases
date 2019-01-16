@@ -1,4 +1,4 @@
-# HAProxy
+# pfSense
 ### Prerequisite
 #### Network
 If you don't have the networks or wish to deploy all the networks required for this
@@ -26,7 +26,7 @@ A working Cloudify manager and a configured management network and router.
  * Cloudify utilities plugin
 * Upload (if needed) the basic OpenStack vnf blueprint (generic_provision) with the blueprint id of "connected_host",
  this is needed for importing the blueprint in the different components.
-* Upload the haproxy blueprint.
+* Upload the pfSense blueprint.
 * Deploy the blueprint with the relevant inputs and secrets.
 
 ## Configuring
