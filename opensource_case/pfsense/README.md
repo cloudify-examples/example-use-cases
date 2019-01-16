@@ -18,7 +18,7 @@ A working Cloudify manager and a configured management network and router.
 * keystone_password
 * keystone_tenant_name
 * keystone_url
-* keystone_region
+* get_secret: region
 
 ### How to run?
 * Upload to the Cloudify manager the following plugins:
