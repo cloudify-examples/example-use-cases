@@ -31,7 +31,6 @@ A working Cloudify manager and a configured management network and router.
 * Deploy the blueprint with the relevant inputs and secrets.
 
 ## Configuring
-### Prerequisite
 Upload a new HAProxy configuration file to a running HAProxy server, and restart the service.
 
 #### Inputs
