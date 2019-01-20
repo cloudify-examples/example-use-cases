@@ -14,7 +14,7 @@ def configure():
     tmpfile = '/tmp/haproxy_{0}.cfg'.format(uuid.uuid4())
     put(haproxy_config, tmpfile)
     ctx.logger.info('Validating the given HAProxy configuration file')
-    run('/usr/sbin/haproxy -f {0} -c'.format(CONFIG_PATH))
+    run('/usr/sbin/haproxy -f {0} -c'.format(tmpfile))
     ctx.logger.info('Copying the configuration file to {0}'
                     .format(CONFIG_PATH))
     sudo('mv {0} {1}'.format(tmpfile, CONFIG_PATH))
