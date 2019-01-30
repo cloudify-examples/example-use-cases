@@ -8,7 +8,7 @@ description: >
 
 imports:
   - http://www.getcloudify.org/spec/cloudify/4.5.5.dev1/types.yaml
-  - http://www.getcloudify.org/spec/fabric-plugin/1.5.1/plugin.yaml
+  - plugin:cloudify-fabric-plugin?version=1.5.1
 
 inputs:
   host_string:
