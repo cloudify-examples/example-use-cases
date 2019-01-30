@@ -4,7 +4,7 @@
 #### Network
 If you don't have the networks or wish to deploy all the networks required for this
 example automatically please deploy the network topolgy blueprints.
-#### Cloudify manager
+#### Cloudify Manager
 A working Cloudify manager and a configured management network and router.
 #### Inputs
 * network_deployment_name - Deployment name of the VNF network

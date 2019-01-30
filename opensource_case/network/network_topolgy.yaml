@@ -20,29 +20,34 @@ inputs:
     description: OpenStack tenant external network name.
 
   nameservers:
+    description: DNS servers to configure on the machine.
     default: [8.8.4.4, 8.8.8.8]
 
   public_subnet_cidr:
+    description: Network between the HA-Proxy and the pFsense.
     default: 10.10.0.0/24
 
   public_subnet_application_pool:
+    description: IP pool for the public network to associate IP from.
     default:
     - start: 10.10.0.2
       end: 10.10.0.254
 
   private_subnet_cidr:
+    description: Network between the pFsense and the HTTPd.
     default: 10.10.1.0/24
 
   private_subnet_application_pool:
+    description: IP pool for the private network to associate IP from.
     default:
     - start: 10.10.1.2
       end: 10.10.1.254
 
   mgmt_network_id:
-    description: manager network
+    description: Cloudify Manager's network ID
 
   router_id:
-    description: manager network
+    description: Cloudify Manager's connected router ID
 
 node_templates:
   external_network:
