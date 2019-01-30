@@ -21,9 +21,9 @@ node_templates:
     type: pfsense--host
     relationships:
       - type: cloudify.relationships.connected_to
-        target: private_network
-      - type: cloudify.relationships.connected_to
         target: mgmt_network
+      - type: cloudify.relationships.connected_to
+        target: private_network
       - type: cloudify.relationships.connected_to
         target: public_network
 

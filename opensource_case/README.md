@@ -1,4 +1,4 @@
-# Opensorce VNF network
+# Open Source VNF Network
 ## How to implement?
 * Every VNF has a common provisioning step, loading the existing image on to the node.
 So each VNF inherits from a basic node type, which loads an image from OpenStack.

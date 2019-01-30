@@ -23,9 +23,9 @@ node_templates:
       - type: cloudify.openstack.server_connected_to_floating_ip
         target: ip
       - type: cloudify.relationships.connected_to
-        target: public_network
-      - type: cloudify.relationships.connected_to
         target: mgmt_network
+      - type: cloudify.relationships.connected_to
+        target: public_network
 
   openstack:
     type: cloudify.nodes.DeploymentProxy

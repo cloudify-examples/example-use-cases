@@ -1,8 +1,8 @@
-# VNF network
+# VNF Network
 ## Prerequisite
 ### Network
 The management network and the central router needs to be exisiting.
-### Cloudify manager
+### Cloudify Manager
 A working Cloudify manager and a configured management network and router.
 ### Inputs
 * external_network_name - OpenStack tenant external network name.
