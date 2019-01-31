@@ -16,10 +16,10 @@ inputs:
       REST API endpoint of the pfSense instance
   api_key:
     description: >
-      The api key of FauxAPI
+      The api key for the REST service
   api_secret:
     description: >
-      The api secret of FauxAPI
+      The api secret for the REST service
 
 node_templates:
   config_patch:
