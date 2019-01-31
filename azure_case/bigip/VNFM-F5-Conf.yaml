@@ -17,12 +17,13 @@ inputs:
   bigip_ip:
     default: { get_capability: [ {get_input: prov_deployment_name}, mgmt_nic, public_ip ] }
 
-  # Below can't be taken from capabilities, as NIC azure nodes doesn't expose it's IPs there
   public_ip:
     type: string
+    default: { get_capability: [ {get_input: prov_deployment_name}, public_nic, ip ] }
 
   wan_ip:
     type: string
+    default: { get_capability: [ {get_input: prov_deployment_name}, wan_nic, ip ] }
 
 dsl_definitions:
 

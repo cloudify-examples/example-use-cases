@@ -11,6 +11,12 @@ inputs:
   prov_deployment_name:
     default: VNFM-F5-Prov-Azure-vm
 
+  fg_prov_deployment_name:
+    default: VNFM-Fortigate-Prov-Azure-vm
+
+  fg_conf_deployment_name:
+    default: VNFM-Fortigate-Conf
+
   bigip_ip:
     default: { get_capability: [ {get_input: prov_deployment_name}, mgmt_nic, public_ip ] }
 
@@ -18,17 +24,19 @@ inputs:
     description: >
       WAN network ip address of Firewall
     type: string
+    default: { get_capability: [ {get_input: fg_prov_deployment_name}, wan_ip ] }
 
   fw_wan_port:
     description: >
       TCP port on which the service is exposed on Firewall
     type: integer
-    default: 8080
+    default: { get_capability: [ {get_input: fg_conf_deployment_name}, wan_port ] }
 
   lb_public_ip:
     description: >
       Load balancer public network IP
     type: string
+    default: { get_capability: [ {get_input: prov_deployment_name}, public_nic, ip ] }
     
   lb_public_port:
     description: >
@@ -70,3 +78,7 @@ node_templates:
             terminal_auth: *terminal_auth
             calls:
               - template: Resources/templates/ltm_config_stop.txt
+
+outputs:
+  web_server:
+    value: { concat: [ { get_input: bigip_ip }, ':', {get_input: lb_public_port} ] }

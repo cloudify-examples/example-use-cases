@@ -28,6 +28,7 @@ inputs:
     type: string
     description: >
       IP address of WAN interface
+    default: { get_capability: [ { get_input: fortigate_vm_deployment_name }, wan_ip] }
 
   wan_port:
     type: string
@@ -39,6 +40,7 @@ inputs:
     type: string
     description: >
       IP address of LAN host
+    default: { get_capability: [ { get_input: fortigate_vm_deployment_name }, lan_nic] }
 
 node_templates:
 
@@ -78,3 +80,7 @@ node_templates:
             terminal_auth: *terminal_auth
             calls:
               - template: templates/fortigate-portforward-stop.txt
+
+capabilities:
+  wan_port:
+    value: { get_input: wan_port }

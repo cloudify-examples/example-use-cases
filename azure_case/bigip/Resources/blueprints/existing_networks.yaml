@@ -8,18 +8,13 @@ imports:
   - plugin:cloudify-azure-plugin
 
 inputs:
-  resource_prefix:
-    default: cfy
-
-  resource_suffix:
-    default: 2
 
   retry_after:
     type: integer
     default: 60
 
   location:
-    default: westeurope
+    default: { get_secret: azure_location }
 
   network_api_version:
     description: >

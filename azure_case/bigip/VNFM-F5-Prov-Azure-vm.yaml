@@ -12,7 +12,7 @@ inputs:
     default: Standard_A7
 
   vm_name:
-    default: F5LoadBalancer2
+    default: BIGIP
 
   virtual_machine_image_sku:
     default: 'f5-big-all-1slot-byol'
@@ -39,7 +39,7 @@ node_templates:
     properties:
       azure_config: *client_config
       use_external_resource: false
-      name: {get_input: vm_name}
+      name: { concat: [ { get_input: resource_prefix }, {get_input: vm_name}, { get_input: resource_suffix } ] }
       location: { get_input: location }
       os_family: linux
       agent_config:
@@ -78,8 +78,7 @@ node_templates:
     type: cloudify.azure.nodes.storage.StorageAccount
     properties:
       azure_config: *client_config
-      use_external_resource: false
-      name: { concat: [ {get_input: vm_name}, 'sa0' ] }
+      name: { concat: [ { get_input: resource_prefix }, {get_input: vm_name}, "sa", { get_input: resource_suffix } ] }
       location: { get_input: location }
       resource_config:
         accountType: Standard_LRS
@@ -91,13 +90,17 @@ capabilities:
   mgmt_nic:
     value:
       name: { get_attribute: [mgmt_nic, name] }
-      ip: { get_attribute: [virtual_machine, ip] }
-      public_ip: { get_attribute: [virtual_machine, public_ip] }
+      ip: { get_attribute: [mgmt_nic, ip] }
+      public_ip: { get_attribute: [mgmt_nic, public_ip] }
   wan_nic:
     value:
       name: { get_attribute: [wan_nic, name] }
+      ip: { get_attribute: [wan_nic, ip] }
+      public_ip: { get_attribute: [wan_nic, public_ip] }
   public_nic:
     value:
       name: { get_attribute: [public_nic, name] }
+      ip: { get_attribute: [public_nic, ip] }
+      public_ip: { get_attribute: [public_nic, public_ip] }
   vm_name:
     value: { get_attribute: [virtual_machine, name] }

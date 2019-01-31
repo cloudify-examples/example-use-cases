@@ -102,7 +102,7 @@ inputs:
 
   vnf_vm_name:
     type: string
-    default: fortigatevm
+    default: fortigate
 
 dsl_definitions:
   azure_config: &azure_config
@@ -191,6 +191,7 @@ node_templates:
     type: cloudify.azure.nodes.network.IPConfiguration
     properties:
       azure_config: *azure_config
+      name: { concat: [ { get_input: resource_prefix }, 'fg_mgmt_ic', { get_input: resource_suffix } ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
       resource_config:
@@ -208,7 +209,7 @@ node_templates:
     properties:
       azure_config:  *azure_config
       use_external_resource: false
-      name: { concat: [ { get_input: resource_prefix }, '_mgmtpia', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'fg_mgmt_ia', { get_input: resource_suffix } ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
       resource_config:
@@ -222,6 +223,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       location: { get_input: location }
+      name: { concat: [ { get_input: resource_prefix }, 'fg_mgmt_n', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
       primary: true
     relationships:
@@ -237,6 +239,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       location: { get_input: location }
+      name: { concat: [ { get_input: resource_prefix }, 'fg_wan_ic', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
       resource_config:
         privateIPAllocationMethod: Dynamic
@@ -251,6 +254,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       location: { get_input: location }
+      name: { concat: [ { get_input: resource_prefix }, 'fg_wan_n', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
       primary: false
     relationships:
@@ -266,6 +270,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       location: { get_input: location }
+      name: { concat: [ { get_input: resource_prefix }, 'fg_lan_ic', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
       resource_config:
         privateIPAllocationMethod: Dynamic
@@ -280,6 +285,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       location: { get_input: location }
+      name: { concat: [ { get_input: resource_prefix }, 'fg_lan_n', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
       primary: false
     relationships:
@@ -333,3 +339,7 @@ capabilities:
 
   vm_public_ip_address:
     value: { get_attribute: [vnf_vm, public_ip_address] }
+  wan_ip:
+    value: { get_attribute: [wan_nic, ip] }
+  lan_ip:
+    value: { get_attribute: [lan_nic, ip] }
