@@ -5,12 +5,6 @@ imports:
   - plugin:cloudify-openstack-plugin
 
 inputs:
-  manager_network:
-    description: Management network.
-  private_key:
-    description: >
-      The content of the agent's private key.
-    default: { get_secret: private_key_path }
   image_name:
     description: >
       An OpenStack Image ID.
@@ -46,5 +40,3 @@ node_types:
           key_name: { get_input: private_key_name }
           image: { get_input: image_name }
           flavor: { get_input: flavor }
-      management_network_name:
-        default: ''

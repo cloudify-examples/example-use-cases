@@ -3,8 +3,9 @@
 ### Network
 The management network and the central router needs to be existing.
 ### Cloudify Manager
-A working Cloudify manager and a configured management network and router.
-### Inputs
+A working Cloudify Manager of 4.5.5 version (or more recent) must be used, due to the service composition functionality this blueprint leverages,
+and a configured management network and router.
+### Required Inputs
 * external_network_name - OpenStack tenant external network name.
 * nameservers - IP addresses of DNS nameservers.
 * public_subnet_cidr
@@ -13,6 +14,10 @@ A working Cloudify manager and a configured management network and router.
 * private_subnet_application_pool
 * mgmt_network_id - Existing management network name
 * router_id - Existing network router.
+
+Please see the inputs example for the service_chaining blueprint,
+which is included here 'example_inputs.yaml'.
+
 ### Secrets
 * keystone_username
 * keystone_password
@@ -21,9 +26,15 @@ A working Cloudify manager and a configured management network and router.
 * keystone_region
 
 ## How to run?
-* Upload to the Cloudify manager all the required blueprints (see relevant guides):
+* Upload to the Cloudify manager the following plugins:
+ * OpenStack plugin
+ * Cloudify utilities plugin
+* Upload (if needed) the basic OpenStack vnf provision blueprint with the blueprint id "connected_host",
+ this is needed for using that shared blueprint in the different components blueprints as a part of the
+ service composition functionality been used here.
+* Upload to the Cloudify manager all the required blueprints:
  * HAProxy
- * httpd
+ * HTTPd
  * PFSense
 * Upload service_chaining blueprint.
 * Deploy the blueprint with the relevant inputs and secrets.
