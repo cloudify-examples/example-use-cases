@@ -8,40 +8,33 @@ imports:
   - plugin:cloudify-utilities-plugin
 
 inputs:
-  prov_deployment_name:
+  f5_prov_deployment_name:
     default: VNFM-F5-Prov-Azure-vm
 
-  bigip_ip:
-    default: { get_capability: [ {get_input: prov_deployment_name}, mgmt_nic, public_ip ] }
+  fg_conf_deployment_name:
+    default: VNFM-Fortigate-Conf
 
-  fw_wan_ip:
-    description: >
-      WAN network ip address of Firewall
-    type: string
+  httpd_prov_deployment_name:
+    default: VNFM-HTTPD-Prov-Azure-vm
 
-  fw_wan_port:
-    description: >
-      TCP port on which the service is exposed on Firewall
-    type: integer
-    default: 8080
-
-  lb_public_ip:
-    description: >
-      Load balancer public network IP
-    type: string
-    
   lb_public_port:
     description: >
       Load balancer public network port on which service is exposed 
     type: integer
     default: 8080
 
+  wan_port:
+    type: string
+    description: >
+      Port on which service is going to be exposed
+    default: '8080'
+
 dsl_definitions:
 
   terminal_auth: &terminal_auth
     user: { get_secret: bigip_username }
     password: { get_secret: bigip_password }
-    ip: { get_input: bigip_ip }
+    ip: { get_capability: [ {get_input: f5_prov_deployment_name}, mgmt_public_ip ] }
     promt_check:
       - '#'
       - '$'
@@ -49,8 +42,39 @@ dsl_definitions:
       - "Command fail."
 
 node_templates:
- 
-  #For service blueprint
+
+  fg_port_forwarding:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            terminal_auth: &fg_terminal_auth
+              user: { get_secret: fortigate_username }
+              password: { get_secret: fortigate_password }
+              ip: { get_capability: [ { get_input: fg_conf_deployment_name }, mgmt_public_ip] }
+              promt_check:
+                - '#'
+                - '$'
+              errors:
+                - "Command fail."
+            calls:
+              - action: exit
+        start:
+          inputs:
+            terminal_auth: *fg_terminal_auth
+            calls:
+              - template: Resources/templates/fortigate-portforward-start.txt
+                params:
+                  PORTFORWARD_IP: { get_capability: [ { get_input: httpd_prov_deployment_name }, lan_ip] }
+                  PORTFORWARD_PORT: { get_input: wan_port }
+                  EXTERNAL_IP: { get_capability: [ { get_input: fg_conf_deployment_name }, wan_ip] }
+        stop:
+          inputs:
+            terminal_auth: *fg_terminal_auth
+            calls:
+              - template: Resources/templates/fortigate-portforward-stop.txt
+
   ltm_config:
     type: cloudify.terminal.raw
     interfaces:
@@ -61,12 +85,20 @@ node_templates:
             calls:
               - template: Resources/templates/ltm_config.txt
                 params:
-                  APP_NODE_1_IP: { get_input: fw_wan_ip }
-                  APP_NODE_1_PORT: { get_input: fw_wan_port }
-                  DESTINATION_IP: { get_input: lb_public_ip }
+                  APP_NODE_1_IP: { get_capability: [ {get_input: fg_conf_deployment_name}, wan_ip ] }
+                  APP_NODE_1_PORT: { get_input: wan_port }
+                  DESTINATION_IP: { get_capability: [ {get_input: f5_prov_deployment_name}, public_ip ] }
                   DESTINATION_PORT: { get_input: lb_public_port }
         stop:
           inputs:
             terminal_auth: *terminal_auth
             calls:
               - template: Resources/templates/ltm_config_stop.txt
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: fg_port_forwarding
+
+
+outputs:
+  web_server:
+    value: { concat: [ { get_capability: [ {get_input: f5_prov_deployment_name}, public_public_ip ] }, ':', {get_input: lb_public_port} ] }

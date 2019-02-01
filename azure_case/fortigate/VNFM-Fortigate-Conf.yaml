@@ -7,38 +7,9 @@ imports:
 inputs:
 
   fortigate_vm_deployment_name:
+    description: Name of Fortigate Provisioning deployment
     type: string
     default: VNFM-Fortigate-Prov-Azure-vm
-
-  vm_os_username:
-    description: >
-      Username to create as the VM's administrator user
-    type: string
-    required: true
-    default: cloudify
-
-  vm_os_password:
-    description: >
-      Password to use for the VM's administrator user
-    type: string
-    required: true
-    default: Cl0ud1fy!
-
-  wan_ip:
-    type: string
-    description: >
-      IP address of WAN interface
-
-  wan_port:
-    type: string
-    description: >
-      Port on which service is going to be exposed
-    default: '8080'
-
-  lan_ip:
-    type: string
-    description: >
-      IP address of LAN host
 
 node_templates:
 
@@ -49,8 +20,8 @@ node_templates:
         create:
           inputs:
             terminal_auth: &terminal_auth
-              user: { get_input: vm_os_username }
-              password: { get_input: vm_os_password }
+              user: { get_secret: fortigate_username }
+              password: { get_secret: fortigate_password }
               ip: { get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }
               promt_check:
                 - '#'
@@ -64,17 +35,10 @@ node_templates:
             terminal_auth: *terminal_auth
             calls:
               - template: templates/fortigate-baseline.txt
-        start:
-          inputs:
-            terminal_auth: *terminal_auth
-            calls:
-              - template: templates/fortigate-portforward-start.txt
-                params:
-                  PORTFORWARD_IP: { get_input: lan_ip }
-                  PORTFORWARD_PORT: { get_input: wan_port }
-                  EXTERNAL_IP: { get_input: wan_ip }
-        stop:
-          inputs:
-            terminal_auth: *terminal_auth
-            calls:
-              - template: templates/fortigate-portforward-stop.txt
+
+
+capabilities:
+  mgmt_public_ip:
+    value: { get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }
+  wan_ip:
+    value: { get_capability: [ { get_input: fortigate_vm_deployment_name }, wan_ip] }

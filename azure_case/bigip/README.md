@@ -1,26 +1,15 @@
 # F5 Big-IP on Azure
 
-## Prerequesites:
+## Prerequisites:
 
-Prior to any deployment installation You have to upload plugins and create secrets.
-
-### Plugins 
-
-Upload:
-* **cloudify-azure-plugin** - Tested for 2.1.0 version,
-* **cloudify-utilities-plugin** - Tested for version 1.12.0
+### Common resource creation
+Prior to any deployment You have to upload plugins, create secrets and create common environment - [instructions](../common/README.md)
 
 ### Secrets
 
 Create below secrets on secrets store management:
-* **BIG-IP secrets:**
-    * *bigip_username* - Username for BIG IP VE, it is set during provisioning and used during configuration, "admin" is not allowed
-    * *bigip_password* - Password for BIG IP VE, it is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special characterr. Control characters are not allowed
-* **Azure secrets:**
-    * *azure_client_id*
-    * *azure_client_secret*
-    * *azure_subscription_id*
-    * *azure_tenant_id*
+* **bigip_username** - Username for BIG IP VE, it is set during provisioning and used during configuration, "admin" is not allowed
+* **bigip_password** - Password for BIG IP VE, it is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special characterr. Control characters are not allowed
 
 ## Provisioning 
 
@@ -29,28 +18,48 @@ VNFM-F5-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine co
 * WAN,
 * Public.
 
-### Prerequesites
+### Inputs
+* *virtual_machine_size* - Name of Virtual Machine Size in Azure - default: Standard_A7
+* *vm_name* - Name of Virtual Machine - default: BIGIP
+* *virtual_machine_image_sku* - An instance of an offer, such as a major release of a distribution - default: 'f5-big-all-1slot-byol'
+* *virtual_machine_image_publisher* - Name of the organization that created the image - default: 'f5-networks'
+* *virtual_machine_image_offer* - The name of a group of related images created by a publisher - default: 'f5-big-ip-byol'
+* *retry_after* - The number of seconds for each task retry interval (in the
+          case of iteratively checking the status of an asynchronous operation) - default: 5
+* *resource_prefix* - Prefix of every resource created at this deployment on Azure - default: cfy
+* *resource_suffix* - Suffix of every resource created at this deployment on Azure - default: 0
+* *network_api_version* - API Version for Network - default: "2015-06-15"
+* *azure_network_deployment_name* - Name of deployment responsible for creation resource group, security group and networks -
+    default: VNFM-Networking-Prov-Azure-networks
 
-Before installation of VNFM-F5-Prov-Azure-vm.yaml, suitable resource group, networks and security group have to be created.
-Go to *common* directory and install blueprint as described in readme file.
-It should be installed only one time before start of provisioning services.
+### Installation
 
-### BIG-IP provisioning
+Resources created in Prerequisites subsection are fetched using existing_networks.yaml blueprint and VNFM-F5-Prov-Azure-vm.yaml is using it.
 
-Resources created in Prerequesites subsection are fetched using existing_networks.yaml blueprint and VNFM-F5-Prov-Azure-vm.yaml is using it.
-To provision BIG-IP:
+To provision BIG-IP execute:
 
 ``cfy install VNFM-F5-Prov-Azure-vm.yaml -b VNFM-F5-Prov-Azure-vm``
 
+### Uninstalling
+
+To delete BIG IP execute:
+
+``cfy uninstall VNFM-F5-Prov-Azure-vm``
 
 ## Configuration
 
+### Inputs
+
+* *bigip_license_key* - License key for BIG IP VE
+* *prov_deployment_name* - Name of BIG IP Provisioning deployment created in previous section
+
 ### Install
-VNFM-F5-Conf.yaml is responsible for licensing BIG IP with provided registration key (bigip_license_key input).
-Additionally VLAN configuration necessary for further LTM configuration is applied.
+VNFM-F5-Conf.yaml is responsible for licensing BIG IP with provided registration key and applying VLAN configuration necessary for further LTM configuration.
 
 ``cfy install VNFM-F5-Conf.yaml -b VNFM-F5-Conf``
 
 ### Uninstall
 During uninstall the license is revoked so it can be used on different BIG IP VE or on the same one again.
 Also VLAN configuration is deleted.
+
+``cfy uninstall VNFM-F5-Conf``
