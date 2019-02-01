@@ -13,21 +13,21 @@ The VNFs are:
 Creation of whole service consists of following steps:
 1. Environment preparation\
 Creation of networks, resource group and security group. 
-For details check [common README](common/README.md)
+For details check [common/README](common/README.md)
 2. Provisioning of VNFs\
 Creation of Virtual Machines on Azure and connecting those to proper networks.\
 Each VNF is created by blueprint named VNFM-<VNF_NAME>-Prov-Azure-vm.yaml:
-* bigip/VNFM-F5-Prov-Azure-vm.yaml
-* fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml
-* httpd/VNFM-HTTPD-Prov-Azure-vm.yaml
+* bigip/VNFM-F5-Prov-Azure-vm.yaml - [BIG IP Provisioning instruction](bigip/README.md##Provisioning)
+* fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml - [Fortigate Provisioning instruction](bigip/README.md##Provisioning)
+* httpd/VNFM-HTTPD-Prov-Azure-vm.yaml - [HTTPD Provisioning instruction](httpd/README.md##Provisioning)
 3. Configuration of VNFs\
 Basic configuration of VNFs.\
 VNFs are configured with blueprint named VNFM-<VNF_NAME>-Conf.yaml:
-* bigip/VNFM-F5-Conf.yaml (licensing and VLAN configuration)
-* fortigate/VNFM-Fortigate-Conf.yaml (Setting firewall rules and port forwarding)
-* httpd/VNFM-HTTPD-Conf.yaml (Creation of Web Server)
+* bigip/VNFM-F5-Conf.yaml (licensing and VLAN configuration) - [BIG IP Configuration instruction](bigip/README.md##Configuration)
+* fortigate/VNFM-Fortigate-Conf.yaml (Setting firewall rules and port forwarding) - [Fortigate Configuration instruction](fortigate/README.md##Configuration)
+* httpd/VNFM-HTTPD-Conf.yaml (Creation of Web Server) - [HTTPD Configuration instruction](httpd/README.md##Configuration)
 4. Service creation\
 The last step is to create a service on top of configured VNFs. 
-Use service/NS-LB-Firewall-F5-Fortigate-HTTPD.yaml
+Use service/NS-LB-Firewall-F5-Fortigate-HTTPD.yaml - [Service creation instruction](service/README.md)
 
 After all steps You should be able to display web server on public ip of load balancer (web_server output on Service deployment).

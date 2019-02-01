@@ -9,18 +9,23 @@ imports:
 inputs:
 
   virtual_machine_size:
+    description: Name of Virtual Machine Size in Azure.
     default: Standard_A7
 
   vm_name:
+    description: Name of Virtual Machine.
     default: BIGIP
 
   virtual_machine_image_sku:
+    description: An instance of an offer, such as a major release of a distribution.
     default: 'f5-big-all-1slot-byol'
 
   virtual_machine_image_publisher:
+    description: Name of the organization that created the image.
     default: 'f5-networks'
 
   virtual_machine_image_offer:
+    description: The name of a group of related images created by a publisher.
     default: 'f5-big-ip-byol'
 
 
@@ -40,7 +45,7 @@ node_templates:
       azure_config: *client_config
       use_external_resource: false
       name: { concat: [ { get_input: resource_prefix }, {get_input: vm_name}, { get_input: resource_suffix } ] }
-      location: { get_input: location }
+      location: { get_secret: azure_location }
       os_family: linux
       agent_config:
         install_method: none
@@ -79,7 +84,7 @@ node_templates:
     properties:
       azure_config: *client_config
       name: { concat: [ { get_input: resource_prefix }, {get_input: vm_name}, "sa", { get_input: resource_suffix } ] }
-      location: { get_input: location }
+      location: { get_secret: azure_location }
       resource_config:
         accountType: Standard_LRS
     relationships:
@@ -87,20 +92,15 @@ node_templates:
         target: resource_group
 
 capabilities:
-  mgmt_nic:
-    value:
-      name: { get_attribute: [mgmt_nic, name] }
-      ip: { get_attribute: [mgmt_nic, ip] }
-      public_ip: { get_attribute: [mgmt_nic, public_ip] }
-  wan_nic:
-    value:
-      name: { get_attribute: [wan_nic, name] }
-      ip: { get_attribute: [wan_nic, ip] }
-      public_ip: { get_attribute: [wan_nic, public_ip] }
-  public_nic:
-    value:
-      name: { get_attribute: [public_nic, name] }
-      ip: { get_attribute: [public_nic, ip] }
-      public_ip: { get_attribute: [public_nic, public_ip] }
-  vm_name:
-    value: { get_attribute: [virtual_machine, name] }
+  mgmt_public_ip:
+    description: Public IP of management interface
+    value: { get_attribute: [mgmt_nic, public_ip] }
+  wan_ip:
+    description: Private IP of WAN interface
+    value: { get_attribute: [wan_nic, ip] }
+  public_ip:
+    description: Private IP of Public interface
+    value: { get_attribute: [public_nic, ip] }
+  public_public_ip:
+    description: Public IP of Public interface
+    value: { get_attribute: [public_nic, public_ip] }

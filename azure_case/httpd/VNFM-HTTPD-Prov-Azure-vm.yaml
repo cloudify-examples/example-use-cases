@@ -7,6 +7,7 @@ imports:
 
 inputs:
   image:
+    description: Image information
     default:
       publisher: Canonical
       offer: UbuntuServer
@@ -14,29 +15,23 @@ inputs:
       version: latest
 
   size:
+    description: Name of Virtual Machine Size in Azure.
     default: Basic_A0
 
   retry_after:
     type: integer
     default: 60
 
-  ssh_user:
-    description: The user that will be used to log in to VM
-    default: ubuntu
-
-  rsa_key_public:
-    default: { get_secret: rsa_key_public }
-
   network_deployment_name:
+    description: Name of deployment responsible for creation resource group, security group and networks.
     default: VNFM-Networking-Prov-Azure-networks
 
-  location:
-    default: { get_secret: azure_location }
-
   resource_prefix:
+    description: Prefix of every resource created at this deployment on Azure.
     default: cfy
 
   resource_suffix:
+    description: Suffix of every resource created at this deployment on Azure.
     default: 0
 
 
@@ -54,7 +49,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       name: {get_capability: [{ get_input: network_deployment_name }, resource_group] }
-      location: { get_input: location }
+      location: { get_secret: azure_location }
       use_external_resource: true
 
   virtual_network:
@@ -62,7 +57,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       name: {get_capability: [{ get_input: network_deployment_name }, virtual_network] } 
-      location: { get_input: location }
+      location: { get_secret: azure_location }
       use_external_resource: true
     relationships:
       - type: cloudify.azure.relationships.contained_in_resource_group
@@ -97,7 +92,7 @@ node_templates:
       azure_config: *azure_config
       use_external_resource: false
       name: { concat: [ { get_input: resource_prefix }, 'httpdsa', { get_input: resource_suffix } ] }
-      location: { get_input: location }
+      location: { get_secret: azure_location }
       resource_config:
         accountType: Standard_LRS
     relationships:
@@ -117,14 +112,9 @@ node_templates:
         storageProfile:
           imageReference: { get_input: image}
         osProfile:
-          adminUsername: { get_input: ssh_user }
-          adminPassword: ''
-          linuxConfiguration:
-            ssh:
-              publicKeys:
-                - path: {concat:[ '/home/', { get_input: ssh_user }, '/.ssh/authorized_keys' ]}
-                  keyData: { get_input: rsa_key_public }
-            disablePasswordAuthentication: true
+          computerName: { get_property: [SELF, name] }
+          adminUsername: { get_secret: httpd_username }
+          adminPassword: { get_secret: httpd_password }
       agent_config:
         install_method: none
       azure_config: *azure_config
@@ -201,7 +191,7 @@ node_templates:
     properties:
       azure_config:  *azure_config
       name: { concat: [ { get_input: resource_prefix }, 'httpd_mgmt_ia', { get_input: resource_suffix } ] }
-      location: { get_input: location }
+      location: { get_secret: azure_location }
       retry_after: { get_input: retry_after }
       resource_config:
         publicIPAllocationMethod: Static
@@ -279,5 +269,5 @@ node_templates:
 capabilities:
   vm_public_ip:
     value: { get_attribute: [vm, public_ip] }
-  lan_nic:
+  lan_ip:
     value: { get_attribute: [lan_nic, ip] }

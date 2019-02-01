@@ -9,28 +9,19 @@ imports:
 
 inputs:
   bigip_license_key:
-    default: XNFZK-ZGOJN-WLVPO-LFUPL-SUWZDMU
+    description: License key for BIG IP VE
+    default: SQWIY-XOOAT-SOLLE-CXEWI-PJTUCAH
 
   prov_deployment_name:
+    description: Name of BIG IP Provisioning deployment
     default: VNFM-F5-Prov-Azure-vm
-
-  bigip_ip:
-    default: { get_capability: [ {get_input: prov_deployment_name}, mgmt_nic, public_ip ] }
-
-  public_ip:
-    type: string
-    default: { get_capability: [ {get_input: prov_deployment_name}, public_nic, ip ] }
-
-  wan_ip:
-    type: string
-    default: { get_capability: [ {get_input: prov_deployment_name}, wan_nic, ip ] }
 
 dsl_definitions:
 
   terminal_auth: &terminal_auth
     user: { get_secret: bigip_username }
     password: { get_secret: bigip_password }
-    ip: { get_input: bigip_ip }
+    ip: { get_capability: [ {get_input: prov_deployment_name}, mgmt_public_ip ] }
     promt_check:
       - '#'
       - '$'
@@ -69,24 +60,27 @@ node_templates:
             calls:
               - template: Resources/templates/vlan_config.txt
                 params:
-                  IP_INSIDE: { get_input: wan_ip }
-                  IP_OUTSIDE: { get_input: public_ip }
+                  IP_INSIDE: { get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }
+                  IP_OUTSIDE: { get_capability: [ {get_input: prov_deployment_name}, public_ip ] }
         delete:
           inputs:
             terminal_auth: *terminal_auth
             calls:
               - template: Resources/templates/vlan_config_delete.txt
                 params:
-                  IP_INSIDE: { get_input: wan_ip }
-                  IP_OUTSIDE: { get_input: public_ip }
+                  IP_INSIDE: { get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }
+                  IP_OUTSIDE: { get_capability: [ {get_input: prov_deployment_name}, public_ip ] }
     relationships:
     - type: cloudify.relationships.depends_on
       target: license
 
-outputs:
+capabilities:
   bigip_ip:
-    value: { get_input: bigip_ip }
+    description: Public IP of management interface
+    value: { get_capability: [ {get_input: prov_deployment_name}, mgmt_public_ip ] }
   public_ip:
-    value: { get_input: public_ip }
+    description: Private IP of WAN interface
+    value: { get_capability: [ {get_input: prov_deployment_name}, public_ip ] }
   wan_ip:
-    value: { get_input: wan_ip }
+    description: Private IP of Public interface
+    value: { get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }
