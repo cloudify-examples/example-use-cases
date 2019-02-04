@@ -10,6 +10,7 @@ Prior to any deployment You have to upload plugins, create secrets and create co
 Create below secrets on secrets store management:
 * **fortigate_username** - Username for HTTPD VM, it is set during provisioning and used during configuration,
 * **fortigate_password** - Password for HTTPD VM, it is set during provisioning and used during configuration. 
+* **fortigate_license** - Content of license file, its used during provisioning to license Fortigate
 
 
 ## Provisioning
@@ -34,6 +35,7 @@ Create below secrets on secrets store management:
 * *vm_image_sku* - An instance of an offer, such as a major release of a distribution - fortinet_fg-vm
 * *vm_image_version* - Version of the image - default: 6.0.3
 * *vnf_vm_name* - Name of VM - default: fortigate
+* *fortigate_license_filename* - Name of the Fortigate license file (It will be uploaded to Fortigate VM with this name). It should have .lic file extension. - default: FGVM02TM19000054.lic 
 
 ### Installation
 
@@ -49,20 +51,9 @@ To delete Fortigate execute:
 
 ## Configuration
 
-**IMPORTANT**: The version of the image, which is being used for FortiGate VM instantiation, is of BYOL type. That means, before
-installing the configuration blueprint, the license file has to be manually applied to the newly provisioned FortiGate VM.
-
-To apply license follow below steps:
-1. Acquire fortigate license file (in .lic extension) 
-2. Get public IP address of the VM (*vm_public_ip_address* deployment capability) to log into the FortiGate GUI
-3. Log in using *fortigate_username* and *fortigate_password* secrets
-4. Upload license file and wait till machine finish reboot
-5. Refresh the fortigate GUI to see if the license was properly applied
-
 ### Inputs
 
 * *fortigate_vm_deployment_name* - Name of Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Azure-vm
-
 
 ### Install
 ``VNFM-Fortigate-Conf.yaml`` is responsible for applying the configuration for newly created FortiGate VM. It configures all of the interfaces and prepares NAT rules and policies, which are required to perform the service chain.

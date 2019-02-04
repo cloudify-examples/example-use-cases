@@ -18,7 +18,7 @@ For details check [common/README](common/README.md)
 Creation of Virtual Machines on Azure and connecting those to proper networks.\
 Each VNF is created by blueprint named VNFM-<VNF_NAME>-Prov-Azure-vm.yaml:
 * bigip/VNFM-F5-Prov-Azure-vm.yaml - [BIG IP Provisioning instruction](bigip/README.md##Provisioning)
-* fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml - [Fortigate Provisioning instruction](bigip/README.md##Provisioning)
+* fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml - [Fortigate Provisioning instruction](fortigate/README.md##Provisioning)
 * httpd/VNFM-HTTPD-Prov-Azure-vm.yaml - [HTTPD Provisioning instruction](httpd/README.md##Provisioning)
 3. Configuration of VNFs\
 Basic configuration of VNFs.\
