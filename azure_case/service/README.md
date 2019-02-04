@@ -8,6 +8,13 @@
 
 ## Service creation
 
+NS-LB-Firewall-F5-Fortigate-HTTPD.yaml consists of 2 nodes:
+1. fg_port_forwarding - prepares NAT rules and policies, which are required to perform the service chain.
+2. ltm_config - creates load balancing rule responsible for passing traffic from app (exposed on WAN fortigate interface)
+to BIG-IP Public interface
+
+IP addresses are fetched using *get_capability* function.
+
 ### Inputs
 
 * *f5_prov_deployment_name* - Name of BIG IP Provisioning deployment - default: VNFM-F5-Prov-Azure-vm
@@ -23,3 +30,7 @@
 ### Service validation
 
 After service creation You should be able to display web server using *web_server* deployment output.
+
+### Uninstalling 
+
+``cfy uninstall NS-LB-Firewall-F5-Fortigate-HTTP``

@@ -11,12 +11,17 @@ Create below secrets on secrets store management:
 * **httpd_username** - Username for HTTPD VM, it is set during provisioning and used during configuration,
 * **httpd_password** - Password for HTTPD VM, it is set during provisioning and used during configuration. 
 
+You can create those with following cfy commands:\
+``cfy secrets create httpd_username -s <httpd_username>``\
+``cfy secrets create httpd_password -s <httpd_password>``
 
 ## Provisioning 
 
 VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for creation Ubuntu VM connected to 2 networks:
 * Management,
 * LAN.
+
+Networks names are fetched from network deployment using `get_capability` intrinsic function.
 
 ### Inputs
 * *image* - Image information - default:   
@@ -34,7 +39,7 @@ VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for creation Ubuntu VM connected to
 
 ### Installation
 
-Resources created in Prerequesites subsection are fetched using capabilities mechnism.
+Resources created in Prerequesites subsection are fetched using capabilities mechanism.
 To provision HTTPD:
 
 ``cfy install VNFM-HTTPD-Prov-Azure-vm.yaml -b VNFM-HTTPD-Prov-Azure-vm``

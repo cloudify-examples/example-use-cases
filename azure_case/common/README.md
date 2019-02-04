@@ -10,7 +10,13 @@ Prior to installation You have to upload plugins and create secrets.
 
 Upload:
 * **cloudify-azure-plugin** - Tested for version 2.1.1
-* **cloudify-utilities-plugin** - Tested for version 1.12.0
+* **cloudify-utilities-plugin** - Tested for version 1.12.5
+
+You can do this using Cloudify UI from *Cloudify Catalog* page with *Plugins Catalog* widget just by picking the plugin and clicking *Upload*.\
+Using *cfy* You can upload those with following commands:\
+``cfy plugins upload https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/cloudify_utilities_plugin-1.12.5-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/plugin.yaml``
+
+``cfy plugins upload https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/cloudify_azure_plugin-2.1.1-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/plugin.yaml``
 
 ### Secrets
 
@@ -21,6 +27,13 @@ Create below secrets on secrets store management:
     * *azure_subscription_id* - Service Principal ID
     * *azure_tenant_id* - Service Principal tenant
     * *azure_location* - Specifies the supported Azure location for the resource
+
+You can create those with following cfy commands:\
+``cfy secrets create azure_client_id -s <azure_client_id>``\
+``cfy secrets create azure_client_secret -s <azure_client_secret>``\
+``cfy secrets create azure_subscription_id -s <azure_subscription_id>``\
+``cfy secrets create azure_tenant_id -s <azure_tenant_id>``\
+``cfy secrets create azure_location -s <azure_location>``
 
 ## Environment creation
 
@@ -43,3 +56,7 @@ Install using VNFM-Networking-Prov-Azure-networks.yaml blueprint:
 
 **It should be installed only one time before start of provisioning services.**
 It will be reused automatically by blueprints using capabilities mechanism.
+
+###Uninstalling
+
+``cfy uninstall VNFM-Networking-Prov-Azure-networks``
