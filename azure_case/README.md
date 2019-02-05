@@ -1,6 +1,6 @@
 # Commercial VNF Story
 
-This tutorial presents simple network service consisting of a load balancer and a firewall and simple web service to allow for complete user experience.
+This tutorial presents simple network service consisting of a load balancer, a firewall and simple web service to allow for complete user experience.
 
 ![ns](https://user-images.githubusercontent.com/30900001/52050834-12889e00-2552-11e9-9a68-452e92cc7014.png)
 
@@ -26,8 +26,9 @@ VNFs are configured with blueprint named VNFM-<VNF_NAME>-Conf.yaml:
 * bigip/VNFM-F5-Conf.yaml (licensing and VLAN configuration) - [BIG IP Configuration instruction](bigip/README.md##Configuration)
 * fortigate/VNFM-Fortigate-Conf.yaml (Setting firewall rules and port forwarding) - [Fortigate Configuration instruction](fortigate/README.md##Configuration)
 * httpd/VNFM-HTTPD-Conf.yaml (Creation of Web Server) - [HTTPD Configuration instruction](httpd/README.md##Configuration)
-4. Service creation\
-The last step is to create a service on top of configured VNFs. 
+4. Service chaining\
+The last step creates a service chain of connected network services (Load Balancer, Firewall and Web Server). 
+In this case service chaining consists of port forwarding rule on fortigate and load balancing rule on BIG IP in order to pass traffic through.\
 Use service/NS-LB-Firewall-F5-Fortigate-HTTPD.yaml - [Service creation instruction](service/README.md)
 
 After all steps You should be able to display web server on public ip of load balancer (web_server output on Service deployment).
