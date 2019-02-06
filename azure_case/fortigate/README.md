@@ -8,9 +8,14 @@ Prior to any deployment You have to upload plugins, create secrets and create co
 ### Secrets
 
 Create below secrets on secrets store management:
-* **fortigate_username** - Username for HTTPD VM, it is set during provisioning and used during configuration,
-* **fortigate_password** - Password for HTTPD VM, it is set during provisioning and used during configuration. 
+* **fortigate_username** - Username for Fortigate VM, it is set during provisioning and used during configuration,
+* **fortigate_password** - Password for Fortigate VM, it is set during provisioning and used during configuration. 
+* **fortigate_license** - Content of license file, its used during provisioning to license Fortigate
 
+You can create those with following cfy commands:\
+``cfy secrets create fortigate_username -s <fortigate_username>``\
+``cfy secrets create fortigate_password -s <fortigate_password>``\
+``cfy secrets create fortigate_license -f <path to a fortigate license>``
 
 ## Provisioning
 
@@ -18,6 +23,9 @@ Create below secrets on secrets store management:
 * Management,
 * WAN,
 * LAN.
+
+Network's NICs are conncted to security group created in network deployment deployment.
+Networks and security group names are fetched from network deployment using `get_capability` intrinsic function. 
 
 ### Inputs
 
@@ -34,6 +42,7 @@ Create below secrets on secrets store management:
 * *vm_image_sku* - An instance of an offer, such as a major release of a distribution - fortinet_fg-vm
 * *vm_image_version* - Version of the image - default: 6.0.3
 * *vnf_vm_name* - Name of VM - default: fortigate
+* *fortigate_license_filename* - Name of the Fortigate license file (It will be uploaded to Fortigate VM with this name). It should have .lic file extension. - default: FGVM02TM19000054.lic 
 
 ### Installation
 
@@ -49,27 +58,23 @@ To delete Fortigate execute:
 
 ## Configuration
 
-**IMPORTANT**: The version of the image, which is being used for FortiGate VM instantiation, is of BYOL type. That means, before
-installing the configuration blueprint, the license file has to be manually applied to the newly provisioned FortiGate VM.
+Configuration requires IP addresses of VM created during provisioning, therefore provisioning deployment name 
+is required input so exposed IP addresses are fetched using *get_capability* function, ie:\
+``{ get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }``
 
-To apply license follow below steps:
-1. Acquire fortigate license file (in .lic extension) 
-2. Get public IP address of the VM (*vm_public_ip_address* deployment capability) to log into the FortiGate GUI
-3. Log in using *fortigate_username* and *fortigate_password* secrets
-4. Upload license file and wait till machine finish reboot
-5. Refresh the fortigate GUI to see if the license was properly applied
+``VNFM-Fortigate-Conf.yaml`` is responsible for applying base configuration for newly created FortiGate VM. It configures all of the interfaces.
+It consists of one node:
+1. *fortigate_vnf_config* - Applies base configuration for Fortigate (VNF name change and basic configuration to interfaces) using [fortigate-baseline.txt](Resources/templates/fortigate-baseline.txt) file.
+
 
 ### Inputs
 
 * *fortigate_vm_deployment_name* - Name of Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Azure-vm
 
-
 ### Install
-``VNFM-Fortigate-Conf.yaml`` is responsible for applying the configuration for newly created FortiGate VM. It configures all of the interfaces and prepares NAT rules and policies, which are required to perform the service chain.
 
 ``cfy install VNFM-Fortigate-Conf.yaml -b VNFM-Fortigate-Conf``
 
 ### Uninstall
-During uninstall, all of the NAT rules and policies are being deleted.
 
 ``cfy uninstall VNFM-Fortigate-Conf``

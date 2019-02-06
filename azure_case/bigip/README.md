@@ -11,12 +11,19 @@ Create below secrets on secrets store management:
 * **bigip_username** - Username for BIG IP VE, it is set during provisioning and used during configuration, "admin" is not allowed
 * **bigip_password** - Password for BIG IP VE, it is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special characterr. Control characters are not allowed
 
+You can create those with following cfy commands:\
+``cfy secrets create bigip_username -s <bigip_username>``\
+``cfy secrets create bigip_password -s <bigip_password>``
+
 ## Provisioning 
 
 VNFM-F5-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine connected to 3 networks:
 * Management,
 * WAN,
 * Public.
+
+Network's NICs are conncted to security group created in network deployment deployment.
+Networks and security group names are fetched from network deployment using `get_capability` intrinsic function.
 
 ### Inputs
 * *virtual_machine_size* - Name of Virtual Machine Size in Azure - default: Standard_A7
@@ -34,7 +41,7 @@ VNFM-F5-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine co
 
 ### Installation
 
-Resources created in Prerequisites subsection are fetched using existing_networks.yaml blueprint and VNFM-F5-Prov-Azure-vm.yaml is using it.
+Resources created in Prerequisites subsection are fetched in existing_networks.yaml blueprint file using capabilities and VNFM-F5-Prov-Azure-vm.yaml is using it.
 
 To provision BIG-IP execute:
 
@@ -48,13 +55,22 @@ To delete BIG IP execute:
 
 ## Configuration
 
+Configuration requires IP addresses of VM created during provisioning, therefore Provisioning deployment name 
+is required input so exposed IP addresses are fetched using *get_capability* function, ie:\
+``{ get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }``
+
+VNFM-F5-Conf.yaml is responsible for licensing BIG IP with provided registration key and applying VLAN configuration necessary for further LTM configuration.
+It consists of 2 nodes:
+1. *license* - Applies license using [install_license.txt](Resources/templates/install_license.txt) file and revokes it using [revoke_license.txt](Resources/templates/revoke_license.txt).
+2. *vlan_configuration* - Creates VLAN configuration on WAN and Public interfaces - using [vlan_config.txt](Resources/templates/vlan_config.txt) to apply it during install and [vlan_config_delete.txt](Resources/templates/vlan_config_delete.txt) to tear it down during uninstall.
+
+
 ### Inputs
 
 * *bigip_license_key* - License key for BIG IP VE
 * *prov_deployment_name* - Name of BIG IP Provisioning deployment created in previous section
 
 ### Install
-VNFM-F5-Conf.yaml is responsible for licensing BIG IP with provided registration key and applying VLAN configuration necessary for further LTM configuration.
 
 ``cfy install VNFM-F5-Conf.yaml -b VNFM-F5-Conf``
 

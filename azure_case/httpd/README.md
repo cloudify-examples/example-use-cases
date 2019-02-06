@@ -11,12 +11,18 @@ Create below secrets on secrets store management:
 * **httpd_username** - Username for HTTPD VM, it is set during provisioning and used during configuration,
 * **httpd_password** - Password for HTTPD VM, it is set during provisioning and used during configuration. 
 
+You can create those with following cfy commands:\
+``cfy secrets create httpd_username -s <httpd_username>``\
+``cfy secrets create httpd_password -s <httpd_password>``
 
 ## Provisioning 
 
 VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for creation Ubuntu VM connected to 2 networks:
 * Management,
 * LAN.
+
+For each network NIC, special security group is created (lan_security_group and mgmt_security_group).
+Networks names are fetched from network deployment using `get_capability` intrinsic function.
 
 ### Inputs
 * *image* - Image information - default:   
@@ -34,7 +40,7 @@ VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for creation Ubuntu VM connected to
 
 ### Installation
 
-Resources created in Prerequesites subsection are fetched using capabilities mechnism.
+Resources created in Prerequesites subsection are fetched using capabilities mechanism.
 To provision HTTPD:
 
 ``cfy install VNFM-HTTPD-Prov-Azure-vm.yaml -b VNFM-HTTPD-Prov-Azure-vm``
@@ -47,17 +53,19 @@ To delete VM execute:
 
 ## Configuration
 
+VNFM-HTTPD-Conf.yaml is responsible for starting HTTPD process on the target VM, 
+*web_server* node is responsible for creating such server using following command:\
+``screen -dmS -X python3 -m http.server 8080``\
+The IP address of the target VM is fetched from VNFM-HTTPD-Prov-Azure-vm deployment using capabilities.
+
 ### Inputs
 
 * *httpd_vm_deployment_name* - Name of HTTPD Provisioning deployment
 
 ### Install
-VNFM-HTTPD-Conf.yaml is responsible for starting HTTPD process on the target VM.
-The IP address of the target VM is fetched form VNFM-HTTPD-Prov-Azure-vm deployment using capabilities
 
 ``cfy install VNFM-HTTPD-Conf.yaml -b VNFM-HTTPD-Conf``
 
 ### Uninstall
-During uninstall the HTTPD service is stopped resources are reclaimed.
 
 ``cfy uninstall VNFM-HTTPD-Conf``
