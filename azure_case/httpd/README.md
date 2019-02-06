@@ -21,6 +21,7 @@ VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for creation Ubuntu VM connected to
 * Management,
 * LAN.
 
+For each network NIC, special security group is created (lan_security_group and mgmt_security_group).
 Networks names are fetched from network deployment using `get_capability` intrinsic function.
 
 ### Inputs
@@ -52,17 +53,19 @@ To delete VM execute:
 
 ## Configuration
 
+VNFM-HTTPD-Conf.yaml is responsible for starting HTTPD process on the target VM, 
+*web_server* node is responsible for creating such server using following command:\
+``screen -dmS -X python3 -m http.server 8080``\
+The IP address of the target VM is fetched from VNFM-HTTPD-Prov-Azure-vm deployment using capabilities.
+
 ### Inputs
 
 * *httpd_vm_deployment_name* - Name of HTTPD Provisioning deployment
 
 ### Install
-VNFM-HTTPD-Conf.yaml is responsible for starting HTTPD process on the target VM.
-The IP address of the target VM is fetched form VNFM-HTTPD-Prov-Azure-vm deployment using capabilities
 
 ``cfy install VNFM-HTTPD-Conf.yaml -b VNFM-HTTPD-Conf``
 
 ### Uninstall
-During uninstall the HTTPD service is stopped resources are reclaimed.
 
 ``cfy uninstall VNFM-HTTPD-Conf``

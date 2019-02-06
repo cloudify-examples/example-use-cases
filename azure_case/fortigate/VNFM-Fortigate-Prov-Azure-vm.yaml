@@ -251,6 +251,7 @@ node_templates:
       - type: cloudify.azure.relationships.nic_connected_to_network_security_group
         target: network_security_group
 
+  # Cloud config for fortigate, responsible for license file upload which is being applied at installation
   cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
@@ -300,6 +301,8 @@ node_templates:
         target: wan_nic
       - type: cloudify.azure.relationships.connected_to_nic
         target: lan_nic
+      - type: cloudify.relationships.depends_on
+        target: cloud_config
 
 capabilities:
 

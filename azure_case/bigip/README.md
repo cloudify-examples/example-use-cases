@@ -22,7 +22,8 @@ VNFM-F5-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine co
 * WAN,
 * Public.
 
-Networks names are fetched from network deployment using `get_capability` intrinsic function.
+Network's NICs are conncted to security group created in network deployment deployment.
+Networks and security group names are fetched from network deployment using `get_capability` intrinsic function.
 
 ### Inputs
 * *virtual_machine_size* - Name of Virtual Machine Size in Azure - default: Standard_A7
@@ -58,13 +59,18 @@ Configuration requires IP addresses of VM created during provisioning, therefore
 is required input so exposed IP addresses are fetched using *get_capability* function, ie:\
 ``{ get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }``
 
+VNFM-F5-Conf.yaml is responsible for licensing BIG IP with provided registration key and applying VLAN configuration necessary for further LTM configuration.
+It consists of 2 nodes:
+1. *license* - Applies license using [install_license.txt](Resources/templates/install_license.txt) file and revokes it using [revoke_license.txt](Resources/templates/revoke_license.txt).
+2. *vlan_configuration* - Creates VLAN configuration on WAN and Public interfaces - using [vlan_config.txt](Resources/templates/vlan_config.txt) to apply it during install and [vlan_config_delete.txt](Resources/templates/vlan_config_delete.txt) to tear it down during uninstall.
+
+
 ### Inputs
 
 * *bigip_license_key* - License key for BIG IP VE
 * *prov_deployment_name* - Name of BIG IP Provisioning deployment created in previous section
 
 ### Install
-VNFM-F5-Conf.yaml is responsible for licensing BIG IP with provided registration key and applying VLAN configuration necessary for further LTM configuration.
 
 ``cfy install VNFM-F5-Conf.yaml -b VNFM-F5-Conf``
 

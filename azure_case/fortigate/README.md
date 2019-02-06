@@ -24,7 +24,8 @@ You can create those with following cfy commands:\
 * WAN,
 * LAN.
 
-Networks names are fetched from network deployment using `get_capability` intrinsic function. 
+Network's NICs are conncted to security group created in network deployment deployment.
+Networks and security group names are fetched from network deployment using `get_capability` intrinsic function. 
 
 ### Inputs
 
@@ -61,12 +62,16 @@ Configuration requires IP addresses of VM created during provisioning, therefore
 is required input so exposed IP addresses are fetched using *get_capability* function, ie:\
 ``{ get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }``
 
+``VNFM-Fortigate-Conf.yaml`` is responsible for applying base configuration for newly created FortiGate VM. It configures all of the interfaces.
+It consists of one node:
+1. *fortigate_vnf_config* - Applies base configuration for Fortigate (VNF name change and basic configuration to interfaces) using [fortigate-baseline.txt](Resources/templates/fortigate-baseline.txt) file.
+
+
 ### Inputs
 
 * *fortigate_vm_deployment_name* - Name of Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Azure-vm
 
 ### Install
-``VNFM-Fortigate-Conf.yaml`` is responsible for applying the configuration for newly created FortiGate VM. It configures all of the interfaces.
 
 ``cfy install VNFM-Fortigate-Conf.yaml -b VNFM-Fortigate-Conf``
 

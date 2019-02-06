@@ -1,6 +1,6 @@
 # Network Service 
 
-Creates a service chain of connected network services. 
+Creates a service chain by creating forwarding rules on VNFs (Fortigate and BIG IP). 
 
 ## Prerequisites:
 
@@ -11,7 +11,7 @@ Creates a service chain of connected network services.
 ## Service creation
 
 NS-LB-Firewall-F5-Fortigate-HTTPD.yaml consists of 2 nodes:
-1. *fg_port_forwarding* - prepares NAT rules and policies, which are required to perform the service chain using [fortigate-portforward-start.txt](Resources/templates/fortigate-portforward-start.txt) file to apply configuration and [fortigate-portforward-stop.txt](Resources/templates/fortigate-portforward-stop.txt) to delete it during uninstall.
+1. *fg_port_forwarding* - prepares NAT rules and policies, which are required to perform the service chain. [fortigate-portforward-start.txt](Resources/templates/fortigate-portforward-start.txt) file is used to apply configuration during installation and [fortigate-portforward-stop.txt](Resources/templates/fortigate-portforward-stop.txt) to delete it during uninstall.
 2. *ltm_config* - creates load balancing rule responsible for passing traffic from app (exposed on WAN fortigate interface)
 to BIG-IP Public interface using [ltm_config.txt](Resources/templates/ltm_config.txt) file to apply configuration and [ltm_config_stop.txt](Resources/templates/ltm_config_stop.txt) to delete it during uninstall
 
@@ -27,12 +27,17 @@ IP addresses are fetched using *get_capability* function.
 
 ### Installation
 
+To apply service configuration execute:
+
 ``cfy install NS-LB-Firewall-F5-Fortigate-HTTPD.yaml -b NS-LB-Firewall-F5-Fortigate-HTTPD``
 
 ### Service validation
 
-After service creation You should be able to display web server using *web_server* deployment output.
+After service creation You should be able to display web server exposed on Public interface of BIG-IP. 
+The URL is available on *web_server* deployment output.
 
 ### Uninstalling 
+
+To tear down service configuration execute:
 
 ``cfy uninstall NS-LB-Firewall-F5-Fortigate-HTTP``

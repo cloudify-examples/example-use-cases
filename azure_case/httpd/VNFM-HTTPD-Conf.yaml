@@ -1,4 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_3
+description: >
+    Starts HTTPD process on VM.
 
 imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
@@ -10,7 +12,7 @@ inputs:
     default: VNFM-HTTPD-Prov-Azure-vm
 
 node_templates:
-  node_impl:
+  web_server:
     type: cloudify.terminal.raw
     interfaces:
       cloudify.interfaces.lifecycle:

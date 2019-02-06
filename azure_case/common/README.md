@@ -2,7 +2,18 @@
 
 Before installation of any blueprint, suitable resource group, networks and security group have to be created.
 
-## Prerequesites:
+Following resources are being created in Azure using VNFM-Networking-Prov-Azure-networks.yaml blueprint:
+* **Management Network** - Network for connection with Cloudify Manager. It uses  
+interfaces from this network to establish connection and configure VNFs.
+* **LAN network** - Network for connection between firewall and web server,
+* **WAN network** - Network for connection between load balancer and firewall,
+* **Public network** - Public network connected to load balancer. BIG IP expose Web Server on Public network interface.
+* **Security group** - Security group for VNF NICs, defined by *network_security_group_rules* input,
+* **Resource group** - Group that is required to create any other resource in Azure.
+
+Those resources are fetched in Prov deployments.
+
+## Prerequisites:
 
 Prior to installation You have to upload plugins and create secrets.
 
@@ -47,7 +58,32 @@ You can create those with following cfy commands:\
 * *wan_subnet_cidr* - WAN subnet CIDR - default: 10.10.3.0/24
 * *lan_subnet_cidr* - LAN subnet CIDR - default: 10.10.4.0/24
 * *network_api_version* - API Version for Network - default: "2015-06-15"
-
+* *network_security_group_rules* - Security group rules for VNF's NICs - 
+    default:
+    ````
+      - name: all_tcp
+        properties:
+          description: All TCP
+          protocol: Tcp
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          priority: 100
+          access: Allow
+          direction: Inbound
+      - name: all_ucp
+        properties:
+          description: All UDP
+          protocol: Udp
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          priority: 101
+          access: Allow
+          direction: Inbound
+    ````
 ### Installation
 
 Install using VNFM-Networking-Prov-Azure-networks.yaml blueprint:
