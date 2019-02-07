@@ -12,6 +12,7 @@ inputs:
     default: VNFM-HTTPD-Prov-Azure-vm
 
 node_templates:
+
   web_server:
     type: cloudify.terminal.raw
     interfaces:
@@ -25,4 +26,3 @@ node_templates:
               errors: []
             calls:
               - action: 'screen -dmS -X python3 -m http.server 8080'
-
