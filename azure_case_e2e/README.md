@@ -34,23 +34,23 @@ To learn more about Cloudify manager deployment go to: [Cloudify-Getting-Started
 ## Example overview
 
 Creation of the whole service consists of the following steps. Each step is available as a blueprint (zip archive) in ``Resources`` folder.
-For more details check [azure_case/README](../../azure_case/README.md)
+For more details check [azure_case/README](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/README.md)
 1. *Environment preparation*
-Create networks, a resource group, and a security group. For more details check [common/README](../../azure_case/common/README.md)
+Create networks, a resource group, and a security group. For more details check [common/README](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/common/README.md)
 2. *Provisioning of the VNFs*
 Create the virtual machines in Azure and connect those to the proper networks.
 Each VNF is created using a blueprint named ``VNFM-<VNF_NAME>-Prov-Azure-vm.yaml``:
-* **bigip/VNFM-F5-Prov-Azure-vm.yaml** - [BIG IP Provisioning instruction](../../azure_case/bigip/README.md##Provisioning)
-* **fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml** - [Fortigate Provisioning instruction](../../azure_case/fortigate/README.md##Provisioning)
-* **httpd/VNFM-HTTPD-Prov-Azure-vm.yaml** - [HTTPD Provisioning instruction](../../azure_case/httpd/README.md##Provisioning)
+* **bigip/VNFM-F5-Prov-Azure-vm.yaml** - [BIG IP Provisioning instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/bigip/README.md##Provisioning)
+* **fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml** - [Fortigate Provisioning instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/fortigate/README.md##Provisioning)
+* **httpd/VNFM-HTTPD-Prov-Azure-vm.yaml** - [HTTPD Provisioning instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/httpd/README.md##Provisioning)
 3. *Configure the VNFs*
 Apply basic configuration of the VNFs. This is done using blueprints named ``VNFM-<VNF_NAME>-Conf.yaml``:
-* **bigip/VNFM-F5-Conf.yaml** (licensing and VLAN configuration) - [BIG IP Configuration instruction](../../azure_case/bigip/README.md##Configuration)
-* **fortigate/VNFM-Fortigate-Conf.yaml** (Setting firewall rules and port forwarding) - [Fortigate Configuration instruction](../../azure_case/fortigate/README.md##Configuration)
-* **httpd/VNFM-HTTPD-Conf.yaml** (Creation of Web Server) - [HTTPD Configuration instruction](../../azure_case/httpd/README.md##Configuration)
+* **bigip/VNFM-F5-Conf.yaml** (licensing and VLAN configuration) - [BIG IP Configuration instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/bigip/README.md##Configuration)
+* **fortigate/VNFM-Fortigate-Conf.yaml** (Setting firewall rules and port forwarding) - [Fortigate Configuration instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/fortigate/README.md##Configuration)
+* **httpd/VNFM-HTTPD-Conf.yaml** (Creation of Web Server) - [HTTPD Configuration instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/httpd/README.md##Configuration)
 4. *Service chaining*
 The last step creates a service chain of connected network services (Load Balancer, Firewall and Web Server). In this case service chaining consists of port forwarding rule on Fortigate and load balancing rule on BIG IP in order to pass traffic through.
-Use the ``service/NS-LB-Firewall-F5-Fortigate-HTTPD.yaml`` - [Service creation instruction](../../azure_case/service/README.md)
+Use the ``service/NS-LB-Firewall-F5-Fortigate-HTTPD.yaml`` - [Service creation instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/service/README.md)
 
 Once all steps had been performed, you should be able to access the web page displayed by the web service by accessing the ip of the load balancer (This IP will be the output of the service deployment flow, and will be titled web_server).
 
