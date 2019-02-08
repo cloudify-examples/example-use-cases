@@ -1,6 +1,6 @@
-# Network Service 
+# Network Service
 
-Creates a service chain by creating forwarding rules on VNFs (Fortigate and BIG IP). 
+Creates a service chain by creating forwarding rules on the VNFs (Fortigate and BIG IP).
 
 ## Prerequisites:
 
@@ -19,11 +19,11 @@ IP addresses are fetched using *get_capability* function.
 
 ### Inputs
 
-* *f5_prov_deployment_name* - Name of BIG IP Provisioning deployment, used to get management and Public IPs from BIG IP VE - default: VNFM-F5-Prov-Azure-vm
-* *fg_prov_deployment_name* - Name of Fortigate Provisioning deployment, used to get management and WAN IPs from Fortigate VM - default: VNFM-Fortigate-Conf
-* *httpd_prov_deployment_name* - Name of HTTPD Provisioning deployment, used to fetch HTTPD LAN interface IP - default: VNFM-HTTPD-Prov-Azure-vm
-* *lb_public_port* - Load balancer public network port on which service is exposed - default: 8080
-* *wan_port* - Fortigate WAN port on which service is going to be exposed - default: '8080'
+* *f5_prov_deployment_name* - The name of the BIG IP Provisioning deployment, used to get management and Public IPs from BIG IP VE - default: VNFM-F5-Prov-Azure-vm
+* *fg_prov_deployment_name* - The name of the Fortigate Provisioning deployment, used to get management and WAN IPs from Fortigate VM - default: VNFM-Fortigate-Conf
+* *httpd_prov_deployment_name* - The name of the HTTPD Provisioning deployment, used to fetch HTTPD LAN interface IP - default: VNFM-HTTPD-Prov-Azure-vm
+* *lb_public_port* - Load balancer public network port on which the service is exposed - default: 8080
+* *wan_port* - Fortigate WAN port on which the service is going to be exposed - default: '8080'
 
 ### Installation
 
@@ -33,10 +33,10 @@ To apply service configuration execute:
 
 ### Service validation
 
-After service creation You should be able to display web server exposed on Public interface of BIG-IP. 
+After service creation You should be able to display web server exposed on Public interface of BIG-IP.
 The URL is available on *web_server* deployment output.
 
-### Uninstalling 
+### Uninstalling
 
 To tear down service configuration execute:
 

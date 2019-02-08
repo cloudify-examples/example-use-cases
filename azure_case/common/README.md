@@ -1,37 +1,36 @@
 # Common resources
 
-Before installation of any blueprint, suitable resource group, networks and security group have to be created.
+Before installation of any service, suitable resource group, networks and security group must be created.
 
-Following resources are being created in Azure using VNFM-Networking-Prov-Azure-networks.yaml blueprint:
-* **Management Network** - Network for connection with Cloudify Manager. It uses  
-interfaces from this network to establish connection and configure VNFs.
-* **LAN network** - Network for connection between firewall and web server,
-* **WAN network** - Network for connection between load balancer and firewall,
-* **Public network** - Public network connected to load balancer. BIG IP expose Web Server on Public network interface.
+The following resources are created in Azure using the ``VNFM-Networking-Prov-Azure-networks.yaml`` blueprint:
+* **Management Network** - This network connects the Cloudify manager to all managed components.
+* **LAN network** - This network connects the firewall to the web server.
+* **WAN network** - This network connects the load balancer to the web server.
+* **Public network** - This is the public network accessible to the user. BIG IP exposes the web server on the Public network interface.
 * **Security group** - Security group for VNF NICs, defined by *network_security_group_rules* input,
 * **Resource group** - Group that is required to create any other resource in Azure.
 
-Those resources are fetched in Prov deployments.
+Those resources are fetched by all other provisioning deployments.
 
 ## Prerequisites:
 
-Prior to installation You have to upload plugins and create secrets.
+Prior to installation you have to upload plugins and create secrets.
 
-### Plugins 
+### Plugins
 
 Upload:
 * **cloudify-azure-plugin** - Tested for version 2.1.1
 * **cloudify-utilities-plugin** - Tested for version 1.12.5
 
 You can do this using Cloudify UI from *Cloudify Catalog* page with *Plugins Catalog* widget just by picking the plugin and clicking *Upload*.\
-Using *cfy* You can upload those with following commands:\
+Using *cfy* you can upload those with following commands:\
 ``cfy plugins upload https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/cloudify_utilities_plugin-1.12.5-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/plugin.yaml``
 
 ``cfy plugins upload https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/cloudify_azure_plugin-2.1.1-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/plugin.yaml``
 
 ### Secrets
 
-Create below secrets on secrets store management:
+Create the below secrets in the secret store management:
 * **Azure secrets:**
     * *azure_client_id* - Service Principal appId
     * *azure_client_secret* - Service Principal password
@@ -39,7 +38,7 @@ Create below secrets on secrets store management:
     * *azure_tenant_id* - Service Principal tenant
     * *azure_location* - Specifies the supported Azure location for the resource
 
-You can create those with following cfy commands:\
+You can create those with the following cfy commands:\
 ``cfy secrets create azure_client_id -s <azure_client_id>``\
 ``cfy secrets create azure_client_secret -s <azure_client_secret>``\
 ``cfy secrets create azure_subscription_id -s <azure_subscription_id>``\
@@ -58,7 +57,7 @@ You can create those with following cfy commands:\
 * *wan_subnet_cidr* - WAN subnet CIDR - default: 10.10.3.0/24
 * *lan_subnet_cidr* - LAN subnet CIDR - default: 10.10.4.0/24
 * *network_api_version* - API Version for Network - default: "2015-06-15"
-* *network_security_group_rules* - Security group rules for VNF's NICs - 
+* *network_security_group_rules* - Security group rules for VNF's NICs -
     default:
     ````
       - name: all_tcp
@@ -91,7 +90,7 @@ Install using VNFM-Networking-Prov-Azure-networks.yaml blueprint:
 ``cfy install  VNFM-Networking-Prov-Azure-networks.yaml -b  VNFM-Networking-Prov-Azure-networks``
 
 **It should be installed only one time before start of provisioning services.**
-It will be reused automatically by blueprints using capabilities mechanism.
+It will be reused automatically by blueprints using the capabilities mechanism.
 
 ###Uninstalling
 

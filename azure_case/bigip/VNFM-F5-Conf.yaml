@@ -8,9 +8,6 @@ imports:
   - plugin:cloudify-utilities-plugin
 
 inputs:
-  bigip_license_key:
-    description: License key for BIG IP VE
-    default: SQWIY-XOOAT-SOLLE-CXEWI-PJTUCAH
 
   prov_deployment_name:
     description: Name of BIG IP Provisioning deployment
@@ -40,7 +37,7 @@ node_templates:
             calls:
               - template: Resources/templates/install_license.txt
                 params:
-                  REG_KEY: { get_input: bigip_license_key }
+                  REG_KEY: { get_secret: bigip_license_key }
         delete:
           inputs:
             terminal_auth: *terminal_auth
