@@ -1,8 +1,10 @@
 # End-to-End Network Service - Commercial VNFs
 
+This Blueprint describes the entire network service, by embedding all sub-blueprints describing the different components, and executing the provisioning, configurations, and chaining steps in the proper order.
+
 ## Prerequisites:
 
-Prior to installation you have to upload plugins and create secrets.
+Prior to installation please upload the below plugins and create the mentioned secrets.
 
 ### Plugins
 
@@ -10,8 +12,10 @@ Upload:
 * **cloudify-azure-plugin** - Tested for version 2.1.1
 * **cloudify-utilities-plugin** - Tested for version 1.12.5
 
-You can do this using Cloudify UI from *Cloudify Catalog* page with *Plugins Catalog* widget just by picking the plugin and clicking *Upload*.\
-Using *cfy* you can upload those with following commands:\
+This can be applied through the Cloudify manager user interface or using the CLI.
+* To upload plugins using the Cloudify manager:
+    * Browse to the *Cloudify Catalog* page and scroll to the *Plugins Catalog* widget. Select the relevant plugins and click *Upload*.
+* To upload plugins using the CLI, run the following commands:
 ``cfy plugins upload https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/cloudify_utilities_plugin-1.12.5-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/plugin.yaml``
 
 ``cfy plugins upload https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/cloudify_azure_plugin-2.1.1-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/plugin.yaml``
@@ -65,17 +69,16 @@ You can create those with the following cfy commands:\
 
 ### Installation
 
-To apply service configuration execute:
+To apply the service configuration execute:
 
 ``cfy install VNFM-E2E-F5-Fortigate-HTTPD.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
 
 ### Service validation
 
-After service creation You should be able to display web server exposed on Public interface of BIG-IP.
-The URL is available on *web_server* deployment output.
+Once all steps had been performed, you should be able to access the web page displayed by the web service by accessing the ip of the load balancer (This IP will be the output of the service deployment flow, and will be titled *web_server*).
 
 ### Uninstalling
 
-To tear down service configuration execute:
+To tear down the service configuration execute:
 
 ``cfy uninstall VNFM-E2E-F5-Fortigate-HTTPD``
