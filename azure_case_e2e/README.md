@@ -1,59 +1,86 @@
 # End-to-End Network Service - Commercial VNFs
 
-In this examples we demonstrate how to construct a simple network service consisting of a load balancer and a firewall. To make it a tad more interesting we will be deploying a simple web service to allow for complete user experience:
+This Blueprint describes the entire network service, by embedding all sub-blueprints describing the different components, and executing the provisioning, configurations, and chaining steps in the proper order.
 
-![ns](https://user-images.githubusercontent.com/30900001/52050834-12889e00-2552-11e9-9a68-452e92cc7014.png)
+For more information about particular steps, please go to the [azure_case/README.md](https://github.com/cloudify-examples/example-use-cases/blob/master/azure_case/README.md)
 
-If we break it down to how we would typically build such a service the basic steps would probably be:
+## Prerequisites:
 
-1. Provision a firewall and configure it’s network interfaces and the network settings
+Prior to installation please upload the below plugins and create the mentioned secrets.
 
-2. Provision a load balancer and setup basic settings
+### Plugins
 
-3. Provision a web server instance, configure it, and setup basic web content
+Upload:
+* **cloudify-azure-plugin** - Tested for version 2.1.1
+* **cloudify-utilities-plugin** - Tested for version 1.12.5
 
-4. Compose the service flow by setting the load balancer to accept traffic on a certain port, direct it to the firewall, configure the firewall to allow web traffic to the web server, etc.
+This can be applied through the Cloudify manager user interface or using the CLI.
+* To upload plugins using the Cloudify manager:
+    * Browse to the *Cloudify Catalog* page and scroll to the *Plugins Catalog* widget. Select the relevant plugins and click *Upload*.
+* To upload plugins using the CLI, run the following commands:
+``cfy plugins upload https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/cloudify_utilities_plugin-1.12.5-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/plugin.yaml``
 
-This example contains the blueprint, which performs end-to-end service provisioning & configuration, as well as blueprints implementing each of these steps separately. These can be easily modified for other VNFs or different infrastructure.
+``cfy plugins upload https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/cloudify_azure_plugin-2.1.1-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/plugin.yaml``
 
-Upon completion of this example we will have a complete running network service.
+### Secrets
 
-Note!    The infrastructure used in this example is Microsoft Azure, and the demonstrated VNFs are:
-* F5 BIG-IP VE (Load balancer)
-* Fortigate (Firewall)
-* Httpd (Web Server)
+Create the below secrets in the secret store management:
+* **Azure secrets:**
+    * *azure_client_id* - Service Principal appId
+    * *azure_client_secret* - Service Principal password
+    * *azure_subscription_id* - Service Principal ID
+    * *azure_tenant_id* - Service Principal tenant
+    * *azure_location* - Specifies the supported Azure location for the resource
+    * *bigip_username* - Username for BIG IP VE, it is set during provisioning and used during configuration, "admin" is not allowed
+    * *bigip_password* - Password for BIG IP VE, it is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special character. Control characters are not allowed
+    * *bigip_license_key* - License key for BIG IP VE, it is being applied during configuration
+    * *fortigate_username* - Username for Fortigate VM, it is set during provisioning and used during configuration
+    * *fortigate_password* - Password for Fortigate VM, it is set during provisioning and used during configuration
+    * *fortigate_license* - Content of license file, its used during provisioning to license Fortigate
+    * *httpd_username* - Username for HTTPD VM, it is set during provisioning and used during configuration
+    * *httpd_password* - Password for HTTPD VM, it is set during provisioning and used during configuration
+    * *httpd_website* - Content of website file for HTTPD VM, it is set during provisioning and served after configuration
 
-## Cloudify Manager
+You can create those with the following cfy commands:\
+``cfy secrets create azure_client_id -s <azure_client_id>``\
+``cfy secrets create azure_client_secret -s <azure_client_secret>``\
+``cfy secrets create azure_subscription_id -s <azure_subscription_id>``\
+``cfy secrets create azure_tenant_id -s <azure_tenant_id>``\
+``cfy secrets create azure_location -s <azure_location>``\
+``cfy secrets create bigip_username -s <bigip_username>``\
+``cfy secrets create bigip_password -s <bigip_password>``\
+``cfy secrets create bigip_license_key -s <bigip_license_key>``\
+``cfy secrets create fortigate_username -s <fortigate_username>``\
+``cfy secrets create fortigate_password -s <fortigate_password>``\
+``cfy secrets create fortigate_license -f <path to a fortigate license>``\
+``cfy secrets create httpd_username -s <httpd_username>``\
+``cfy secrets create httpd_password -s <httpd_password>``\
+``cfy secrets create httpd_website -s <httpd_website>``
 
-Before we get started, please make sure you have a Cloudify manager deployed.
+### Inputs
 
-The cloudify manager is available in multiple formats ranging from Docker to RPM. In this tutorial we will be using the docker option and assume that it is deployed on your local computer. It can be of course deployed using any other method and on any given platform.
+* *common_prov_name* - The name of the Common resources provisioning deployment - default: VNFM-Networking-Prov-Azure-networks
+* *f5_prov_name* - The name of the BIG IP Provisioning deployment - default: VNFM-F5-Prov-Azure-vm
+* *f5_conf_name* - The name of the BIG IP Configuration deployment - default: VNFM-F5-Conf
+* *fg_prov_name* - The name of the Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Azure-vm
+* *fg_conf_name* - The name of the Fortigate Configuration deployment - default: VNFM-Fortigate-Conf
+* *httpd_prov_name* - The name of the HTTPD Provisioning deployment - default: VNFM-HTTPD-Prov-Azure-vm
+* *httpd_conf_name* - The name of the HTTPD Configuration deployment - default: VNFM-HTTPD-Conf
+* *service_prov_name* - The name of the Common resources provisioning deployment - default: NS-LB-Firewall-F5-Fortigate-HTTPD
 
-To learn more about Cloudify manager deployment go to: [Cloudify-Getting-Started](https://cloudify.co/download/)
 
-## Example overview
+### Installation
 
-Creation of the whole service consists of the following steps. Each step is available as a blueprint (zip archive) in ``Resources`` folder.
-For more details check [azure_case/README](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/README.md)
-1. *Environment preparation*
-Create networks, a resource group, and a security group. For more details check [common/README](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/common/README.md)
-2. *Provisioning of the VNFs*
-Create the virtual machines in Azure and connect those to the proper networks.
-Each VNF is created using a blueprint named ``VNFM-<VNF_NAME>-Prov-Azure-vm.yaml``:
-* **bigip/VNFM-F5-Prov-Azure-vm.yaml** - [BIG IP Provisioning instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/bigip/README.md##Provisioning)
-* **fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml** - [Fortigate Provisioning instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/fortigate/README.md##Provisioning)
-* **httpd/VNFM-HTTPD-Prov-Azure-vm.yaml** - [HTTPD Provisioning instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/httpd/README.md##Provisioning)
-3. *Configure the VNFs*
-Apply basic configuration of the VNFs. This is done using blueprints named ``VNFM-<VNF_NAME>-Conf.yaml``:
-* **bigip/VNFM-F5-Conf.yaml** (licensing and VLAN configuration) - [BIG IP Configuration instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/bigip/README.md##Configuration)
-* **fortigate/VNFM-Fortigate-Conf.yaml** (Setting firewall rules and port forwarding) - [Fortigate Configuration instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/fortigate/README.md##Configuration)
-* **httpd/VNFM-HTTPD-Conf.yaml** (Creation of Web Server) - [HTTPD Configuration instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/httpd/README.md##Configuration)
-4. *Service chaining*
-The last step creates a service chain of connected network services (Load Balancer, Firewall and Web Server). In this case service chaining consists of port forwarding rule on Fortigate and load balancing rule on BIG IP in order to pass traffic through.
-Use the ``service/NS-LB-Firewall-F5-Fortigate-HTTPD.yaml`` - [Service creation instruction](https://github.com/cloudify-examples/example-use-cases/tree/master/azure_case/service/README.md)
+To apply the service configuration execute:
 
-Once all steps had been performed, you should be able to access the web page displayed by the web service by accessing the ip of the load balancer (This IP will be the output of the service deployment flow, and will be titled web_server).
+``cfy install VNFM-E2E-F5-Fortigate-HTTPD.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
 
-## Install
+### Service validation
 
-For more details about installation go to: [End-to-end service installation README](e2e/README.md)
+Once all steps had been performed, you should be able to access the web page displayed by the web service by accessing the ip of the load balancer (This IP will be the output of the service deployment flow, and will be titled *web_server*).
+
+### Uninstalling
+
+To tear down the service configuration execute:
+
+``cfy uninstall VNFM-E2E-F5-Fortigate-HTTPD``
