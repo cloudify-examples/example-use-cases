@@ -1,9 +1,11 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
+description: >
+  Create an instance of BIG-IP on OpenStack.
+
 imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
   - plugin:cloudify-openstack-plugin
-  - plugin:cloudify-utilities-plugin
 
 inputs:
 
@@ -21,20 +23,15 @@ inputs:
 
   flavor_id:
     type: string
-    default: 5aaa5054-f7a4-4bbe-8b47-69da2308ecb2
+    default: f7cfaaa8-e2db-4f9b-a65b-6a407f340960
 
   image_id:
     type: string
-    default: 20acb407-2a20-405e-9e19-360c0a705368
+    default: 6d8ff903-f35b-43df-b7c2-e219929924b9
 
   vnf_vm_name:
     type: string
-    default: fortigate
-
-  fortigate_license_filename:
-    type: string
-    description: Name of the Fortigate license file (It will be uploaded to Fortigate VM with this name). It should have .lic file extension.
-    default: FGVM02TM19000054.lic
+    default: bigip
 
 
 dsl_definitions:
@@ -55,19 +52,19 @@ node_templates:
       use_external_resource: true
       resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, mgmt_network] }
 
+  public_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *client_config
+      use_external_resource: true
+      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, public_network] }
+
   wan_network:
     type: cloudify.openstack.nodes.Network
     properties:
       openstack_config: *client_config
       use_external_resource: true
       resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, wan_network] }
-
-  lan_network:
-    type: cloudify.openstack.nodes.Network
-    properties:
-      openstack_config: *client_config
-      use_external_resource: true
-      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, lan_network] }
 
   network_security_group:
     type: cloudify.openstack.nodes.SecurityGroup
@@ -84,6 +81,14 @@ node_templates:
       floatingip:
         floating_network_name: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
 
+  public_floating_ip_address:
+    type: cloudify.openstack.nodes.FloatingIP
+    properties:
+      openstack_config: *client_config
+      use_external_resource: false
+      floatingip:
+        floating_network_name: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+
   mgmt_port:
     type: cloudify.openstack.nodes.Port
     properties:
@@ -92,7 +97,7 @@ node_templates:
         name:
           concat:
             - { get_input: resource_prefix }
-            - "_fg_mgmt_port"
+            - "_bigip_mgmt_port"
             - { get_input: resource_suffix }
     relationships:
     - type: cloudify.relationships.contained_in
@@ -102,6 +107,24 @@ node_templates:
     - type: cloudify.openstack.port_connected_to_floating_ip
       target: mgmt_floating_ip_address
 
+  public_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      openstack_config: *client_config
+      port:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_bigip_public_port"
+            - { get_input: resource_suffix }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: public_network
+    - type: cloudify.openstack.port_connected_to_security_group
+      target: network_security_group
+    - type: cloudify.openstack.port_connected_to_floating_ip
+      target: public_floating_ip_address
+
   wan_port:
     type: cloudify.openstack.nodes.Port
     properties:
@@ -110,27 +133,11 @@ node_templates:
         name:
           concat:
             - { get_input: resource_prefix }
-            - "_fg_wan_port"
+            - "_bigip_wan_port"
             - { get_input: resource_suffix }
     relationships:
     - type: cloudify.relationships.contained_in
       target: wan_network
-    - type: cloudify.openstack.port_connected_to_security_group
-      target: network_security_group
-
-  lan_port:
-    type: cloudify.openstack.nodes.Port
-    properties:
-      openstack_config: *client_config
-      port:
-        name:
-          concat:
-            - { get_input: resource_prefix }
-            - "_fg_lan_port"
-            - { get_input: resource_suffix }
-    relationships:
-    - type: cloudify.relationships.contained_in
-      target: lan_network
     - type: cloudify.openstack.port_connected_to_security_group
       target: network_security_group
 
@@ -144,17 +151,6 @@ node_templates:
       use_external_resource: True
       create_if_missing: False
       resource_id: { get_input: image_id }
-
-  # Cloud config for fortigate, responsible for license file upload which is being applied at installation
-  cloud_config:
-    type: cloudify.nodes.CloudInit.CloudConfig
-    properties:
-      resource_config:
-        write_files:
-          - path: { get_input: fortigate_license_filename }
-            owner: root:root
-            permissions: '0444'
-            content: { get_secret: fortigate_license }
 
   vm:
     type: cloudify.openstack.nodes.Server
@@ -171,28 +167,28 @@ node_templates:
               name:
                 concat:
                   - { get_input: resource_prefix }
-                  - "_fg_vm"
+                  - "_bigip_vm"
                   - { get_input: resource_suffix }
               image: { get_property: [ image, resource_id ] }
               flavor: { get_input: flavor_id }
-              userdata: { get_attribute: [ cloud_config, cloud_config ] }
     relationships:
     - type: cloudify.openstack.server_connected_to_port
       target: mgmt_port
     - type: cloudify.openstack.server_connected_to_port
-      target: wan_port
+      target: public_port
     - type: cloudify.openstack.server_connected_to_port
-      target: lan_port
+      target: wan_port
     - type: cloudify.relationships.depends_on
       target: image
-    - type: cloudify.relationships.depends_on
-      target: cloud_config
+
 
 capabilities:
 
-  vm_public_ip_address:
+  vm_public_mgmt_ip_address:
     value: { get_attribute: [mgmt_floating_ip_address, floating_ip_address] }
+  vm_public_ip_address:
+    value: { get_attribute: [public_floating_ip_address, floating_ip_address] }
   wan_ip:
     value: { get_attribute: [wan_port, fixed_ip_address] }
-  lan_ip:
-    value: { get_attribute: [lan_port, fixed_ip_address] }
+  public_ip:
+    value: { get_attribute: [public_port, fixed_ip_address] }

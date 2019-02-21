@@ -11,7 +11,7 @@ inputs:
 
   external_network_name:
     description: Openstack tenant external network name.
-    default: GATEWAY_NET
+    default: ext-net
 
   resource_prefix:
     description: >
@@ -58,9 +58,6 @@ inputs:
     - start: 10.10.4.2
       end: 10.10.4.254
 
-  router_id:
-    default: router
-
   network_security_group_rules:
     default:
       - port_range_min: 1
@@ -69,6 +66,7 @@ inputs:
       - port_range_min: 1
         port_range_max: 65535
         protocol: udp
+
 
 dsl_definitions:
 
@@ -228,7 +226,6 @@ node_templates:
           - { get_input: resource_suffix }
       rules: { get_input: network_security_group_rules }
 
-
 capabilities:
 
   external_network:
@@ -262,4 +259,4 @@ capabilities:
     value: { get_attribute: [ lan_subnet, external_id ] }
 
   network_security_group:
-    value: { get_attribute: [network_security_group, external_id] }
+    value: { get_attribute: [ network_security_group, external_id ] }

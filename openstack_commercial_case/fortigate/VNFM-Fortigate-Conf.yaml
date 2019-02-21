@@ -25,7 +25,7 @@ node_templates:
             terminal_auth: &terminal_auth
               user: admin
               password: ''
-              ip: { get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }
+              ip: { get_capability: [{ get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }
               promt_check:
                 - '#'
                 - '$'
