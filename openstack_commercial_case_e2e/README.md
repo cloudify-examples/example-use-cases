@@ -2,7 +2,7 @@
 
 This Blueprint describes the entire network service, by embedding all sub-blueprints describing the different components, and executing the provisioning, configurations, and chaining steps in the proper order.
 
-For more information about particular steps, please go to the [azure_case/README.md](https://github.com/cloudify-examples/example-use-cases/blob/master/azure_case/README.md)
+For more information about particular steps, please go to the [openstack_commercial_case/README.md](https://github.com/cloudify-examples/example-use-cases/blob/master/openstack_commercial_case/README.md)
 
 ## Prerequisites:
 
@@ -11,7 +11,7 @@ Prior to installation please upload the below plugins and create the mentioned s
 ### Plugins
 
 Upload:
-* **cloudify-azure-plugin** - Tested for version 2.1.1
+* **cloudify-openstack-plugin** - Tested for version 2.14.7
 * **cloudify-utilities-plugin** - Tested for version 1.12.5
 
 This can be applied through the Cloudify manager user interface or using the CLI.
@@ -20,51 +20,39 @@ This can be applied through the Cloudify manager user interface or using the CLI
 * To upload plugins using the CLI, run the following commands:
 ``cfy plugins upload https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/cloudify_utilities_plugin-1.12.5-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/plugin.yaml``
 
-``cfy plugins upload https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/cloudify_azure_plugin-2.1.1-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/plugin.yaml``
+``cfy plugins upload https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases/download/2.14.7/cloudify_openstack_plugin-2.14.7-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases/download/2.14.7/plugin.yaml``
 
 ### Secrets
 
 Create the below secrets in the secret store management:
-* **Azure secrets:**
-    * *azure_client_id* - Service Principal appId
-    * *azure_client_secret* - Service Principal password
-    * *azure_subscription_id* - Service Principal ID
-    * *azure_tenant_id* - Service Principal tenant
-    * *azure_location* - Specifies the supported Azure location for the resource
-    * *bigip_username* - Username for BIG IP VE, it is set during provisioning and used during configuration, "admin" is not allowed
-    * *bigip_password* - Password for BIG IP VE, it is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special character. Control characters are not allowed
+* **Openstack secrets:**
+    * *keystone_username* - Keystone username
+    * *keystone_password* - Keystone password
+    * *keystone_tenant_name* - Keystone tenant name
+    * *keystone_url* - Keystone URL
+    * *keystone_region* - Keystone region
     * *bigip_license_key* - License key for BIG IP VE, it is being applied during configuration
-    * *fortigate_username* - Username for Fortigate VM, it is set during provisioning and used during configuration
-    * *fortigate_password* - Password for Fortigate VM, it is set during provisioning and used during configuration
     * *fortigate_license* - Content of license file, its used during provisioning to license Fortigate
-    * *httpd_username* - Username for HTTPD VM, it is set during provisioning and used during configuration
-    * *httpd_password* - Password for HTTPD VM, it is set during provisioning and used during configuration
     * *httpd_website* - Content of website file for HTTPD VM, it is set during provisioning and served after configuration
 
 You can create those with the following cfy commands:\
-``cfy secrets create azure_client_id -s <azure_client_id>``\
-``cfy secrets create azure_client_secret -s <azure_client_secret>``\
-``cfy secrets create azure_subscription_id -s <azure_subscription_id>``\
-``cfy secrets create azure_tenant_id -s <azure_tenant_id>``\
-``cfy secrets create azure_location -s <azure_location>``\
-``cfy secrets create bigip_username -s <bigip_username>``\
-``cfy secrets create bigip_password -s <bigip_password>``\
+``cfy secrets create keystone_username -s <keystone_username>``\
+``cfy secrets create keystone_password -s <keystone_password>``\
+``cfy secrets create keystone_tenant_name -s <keystone_tenant_name>``\
+``cfy secrets create keystone_url -s <keystone_url>``\
+``cfy secrets create keystone_region -s <keystone_region>``\
 ``cfy secrets create bigip_license_key -s <bigip_license_key>``\
-``cfy secrets create fortigate_username -s <fortigate_username>``\
-``cfy secrets create fortigate_password -s <fortigate_password>``\
 ``cfy secrets create fortigate_license -f <path to a fortigate license>``\
-``cfy secrets create httpd_username -s <httpd_username>``\
-``cfy secrets create httpd_password -s <httpd_password>``\
-``cfy secrets create httpd_website -s <httpd_website>``
+``cfy secrets create httpd_website -f <path to a httpd website>``
 
 ### Inputs
 
-* *common_prov_name* - The name of the Common resources provisioning deployment - default: VNFM-Networking-Prov-Azure-networks
-* *f5_prov_name* - The name of the BIG IP Provisioning deployment - default: VNFM-F5-Prov-Azure-vm
+* *common_prov_name* - The name of the Common resources provisioning deployment - default: VNFM-Networking-Prov-Openstack-networks
+* *f5_prov_name* - The name of the BIG IP Provisioning deployment - default: VNFM-F5-Prov-Openstack-vm
 * *f5_conf_name* - The name of the BIG IP Configuration deployment - default: VNFM-F5-Conf
-* *fg_prov_name* - The name of the Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Azure-vm
+* *fg_prov_name* - The name of the Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Openstack-vm
 * *fg_conf_name* - The name of the Fortigate Configuration deployment - default: VNFM-Fortigate-Conf
-* *httpd_prov_name* - The name of the HTTPD Provisioning deployment - default: VNFM-HTTPD-Prov-Azure-vm
+* *httpd_prov_name* - The name of the HTTPD Provisioning deployment - default: VNFM-HTTPD-Prov-Openstack-vm
 * *httpd_conf_name* - The name of the HTTPD Configuration deployment - default: VNFM-HTTPD-Conf
 * *service_prov_name* - The name of the Common resources provisioning deployment - default: NS-LB-Firewall-F5-Fortigate-HTTPD
 

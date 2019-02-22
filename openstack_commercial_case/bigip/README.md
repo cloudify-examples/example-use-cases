@@ -8,18 +8,14 @@ Prior to any deployment You have to upload plugins, create secrets and create co
 ### Secrets
 
 Create the below secrets in the secret store management:
-* **bigip_username** - Username for BIG IP VE, it is set during provisioning and used during configuration, "admin" is not allowed
-* **bigip_password** - Password for BIG IP VE, it is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special character. Control characters are not allowed
 * **bigip_license_key** - License key for BIG IP VE, it is being applied during configuration.
 
 You can create those with the following cfy commands:\
-``cfy secrets create bigip_username -s <bigip_username>``\
-``cfy secrets create bigip_password -s <bigip_password>``\
 ``cfy secrets create bigip_license_key -s <bigip_license_key>``
 
 ## Provisioning
 
-VNFM-F5-Prov-Azure-vm.yaml is responsible for creation BIG-IP Virtual Machine connected to 3 networks:
+VNFM-F5-Prov-Openstack-vm.yaml is responsible for creation BIG-IP Virtual Machine connected to 3 networks:
 * Management,
 * WAN,
 * Public.
@@ -28,32 +24,25 @@ Network's NICs are connected to security group created in network deployment.
 Networks and security group names are fetched from network deployment using `get_capability` intrinsic function.
 
 ### Inputs
-* *virtual_machine_size* - Name of Virtual Machine Size in Azure - default: Standard_A7
-* *vm_name* - Name of Virtual Machine - default: BIGIP
-* *virtual_machine_image_sku* - An instance of an offer, such as a major release of a distribution - default: 'f5-big-all-1slot-byol'
-* *virtual_machine_image_publisher* - Name of the organization that created the image - default: 'f5-networks'
-* *virtual_machine_image_offer* - The name of a group of related images created by a publisher - default: 'f5-big-ip-byol'
-* *retry_after* - The number of seconds for each task retry interval (in the
-          case of iteratively checking the status of an asynchronous operation) - default: 5
-* *resource_prefix* - Prefix of every resource created at this deployment on Azure - default: cfy
-* *resource_suffix* - Suffix of every resource created at this deployment on Azure - default: 0
-* *network_api_version* - API Version for Network - default: "2015-06-15"
-* *azure_network_deployment_name* - Name of deployment responsible for creation resource group, security group and networks -
-    default: VNFM-Networking-Prov-Azure-networks
+* *flavor_id* - ID of the flavor in OpenStack - default: f7cfaaa8-e2db-4f9b-a65b-6a407f340960
+* *vnf_vm_name* - Name of Virtual Machine - default: bigip
+* *image_id* - ID of the image in OpenStack - default: 6d8ff903-f35b-43df-b7c2-e219929924b9
+* *resource_prefix* - Prefix of every resource created at this deployment on Openstack - default: cfy
+* *resource_suffix* - Suffix of every resource created at this deployment on Openstack - default: 0
+* *openstack_network_deployment_name* - Name of the deployment responsible for router, security group and networks creation -
+    default: VNFM-Networking-Prov-Openstack-networks
 
 ### Installation
 
-Resources created in Prerequisites subsection are fetched in existing_networks.yaml blueprint file using capabilities and VNFM-F5-Prov-Azure-vm.yaml is using it.
-
 To provision BIG-IP execute:
 
-``cfy install VNFM-F5-Prov-Azure-vm.yaml -b VNFM-F5-Prov-Azure-vm``
+``cfy install VNFM-F5-Prov-Openstack-vm.yaml -b VNFM-F5-Prov-Openstack-vm``
 
 ### Uninstalling
 
 To delete BIG IP execute:
 
-``cfy uninstall VNFM-F5-Prov-Azure-vm``
+``cfy uninstall VNFM-F5-Prov-Openstack-vm``
 
 ## Configuration
 

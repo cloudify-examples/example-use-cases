@@ -1,4 +1,4 @@
-# FortiGate NGFW Single VM on Azure
+# FortiGate NGFW Single VM on Openstack
 
 ## Prerequisites:
 
@@ -8,18 +8,14 @@ Prior to any deployment You have to upload plugins, create secrets and create co
 ### Secrets
 
 Create the below secrets in the secret store management:
-* **fortigate_username** - Username for Fortigate VM, it is set during provisioning and used during configuration,
-* **fortigate_password** - Password for Fortigate VM, it is set during provisioning and used during configuration.
 * **fortigate_license** - Content of license file, its used during provisioning to license Fortigate
 
 You can create those with the following cfy commands:\
-``cfy secrets create fortigate_username -s <fortigate_username>``\
-``cfy secrets create fortigate_password -s <fortigate_password>``\
 ``cfy secrets create fortigate_license -f <path to a fortigate license>``
 
 ## Provisioning
 
-``VNFM-Fortigate-Prov-Azure-vm.yaml`` is responsible for FortiGate NGFW Single VM provisioning. VM is connected to 3 networks:
+``VNFM-Fortigate-Prov-Openstack-vm.yaml`` is responsible for FortiGate NGFW Single VM provisioning. VM is connected to 3 networks:
 * Management,
 * WAN,
 * LAN.
@@ -29,32 +25,26 @@ Networks and security group names are fetched from network deployment using `get
 
 ### Inputs
 
-* *retry_after* - The number of seconds for each task retry interval (in the
-          case of iteratively checking the status of an asynchronous operation) - default: 5
 * *resource_prefix* - Prefix of every resource created at this deployment on Azure - default: cfy
 * *resource_suffix* - Suffix of every resource created at this deployment on Azure - default: 0
-* *azure_network_deployment_name* - Name of deployment responsible for creation resource group, security group and networks -
-    default: VNFM-Networking-Prov-Azure-networks
-* *vm_size* - Name of Virtual Machine Size in Azure - default: Standard_B2s
-* *vm_os_family* - default: linux
-* *vm_image_publisher* - Name of the organization that created the image - default: fortinet
-* *vm_image_offer* - The name of a group of related images created by a publisher - default: fortinet_fortigate-vm_v5
-* *vm_image_sku* - An instance of an offer, such as a major release of a distribution - fortinet_fg-vm
-* *vm_image_version* - Version of the image - default: 6.0.3
+* *openstack_network_deployment_name* - Name of deployment responsible for router, security group and networks creation -
+    default: VNFM-Networking-Prov-Openstack-networks
+* *flavor_id* - ID of the flavor in OpenStack - default: 5aaa5054-f7a4-4bbe-8b47-69da2308ecb2
+* *image_id* - ID of the image in OpenStack - default: 20acb407-2a20-405e-9e19-360c0a705368
 * *vnf_vm_name* - Name of VM - default: fortigate
 * *fortigate_license_filename* - Name of the Fortigate license file (It will be uploaded to Fortigate VM with this name). It should have .lic file extension. - default: FGVM02TM19000054.lic
 
 ### Installation
 
-Resources created in Prerequesites subsection are fetched using capabilities exposed by *azure-networks* deployment and ``VNFM-Fortigate-Prov-Azure-vm.yaml`` is using it.
+Resources created in Prerequesites subsection are fetched using capabilities exposed by *common* deployment and ``VNFM-Fortigate-Prov-Openstack-vm.yaml`` is using it.
 To provision FortiGate NGFW Single VM:
 
-``cfy install VNFM-Fortigate-Prov-Azure-vm.yaml -b VNFM-Fortigate-Prov-Azure-vm``
+``cfy install VNFM-Fortigate-Prov-Openstack-vm.yaml -b VNFM-Fortigate-Prov-Openstack-vm``
 
 ### Uninstalling
 To delete Fortigate execute:
 
-``cfy uninstall VNFM-Fortigate-Prov-Azure-vm``
+``cfy uninstall VNFM-Fortigate-Prov-Openstack-vm``
 
 ## Configuration
 
@@ -69,7 +59,7 @@ It consists of one node:
 
 ### Inputs
 
-* *fortigate_vm_deployment_name* - Name of Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Azure-vm
+* *fortigate_vm_deployment_name* - Name of Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Openstack-vm
 
 ### Install
 
