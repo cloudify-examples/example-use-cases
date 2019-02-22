@@ -25,8 +25,8 @@ Networks and security group names are fetched from network deployment using `get
 
 ### Inputs
 
-* *resource_prefix* - Prefix of every resource created at this deployment on Azure - default: cfy
-* *resource_suffix* - Suffix of every resource created at this deployment on Azure - default: 0
+* *resource_prefix* - Prefix of every resource created at this deployment on Openstack - default: cfy
+* *resource_suffix* - Suffix of every resource created at this deployment on Openstack - default: 0
 * *openstack_network_deployment_name* - Name of deployment responsible for router, security group and networks creation -
     default: VNFM-Networking-Prov-Openstack-networks
 * *flavor_id* - ID of the flavor in OpenStack - default: 5aaa5054-f7a4-4bbe-8b47-69da2308ecb2

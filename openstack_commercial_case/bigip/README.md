@@ -1,4 +1,4 @@
-# F5 Big-IP on Azure
+# F5 Big-IP on OpenStack
 
 ## Prerequisites:
 
