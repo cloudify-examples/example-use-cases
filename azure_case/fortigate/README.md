@@ -7,12 +7,12 @@ Prior to any deployment You have to upload plugins, create secrets and create co
 
 ### Secrets
 
-Create below secrets on secrets store management:
+Create the below secrets in the secret store management:
 * **fortigate_username** - Username for Fortigate VM, it is set during provisioning and used during configuration,
-* **fortigate_password** - Password for Fortigate VM, it is set during provisioning and used during configuration. 
+* **fortigate_password** - Password for Fortigate VM, it is set during provisioning and used during configuration.
 * **fortigate_license** - Content of license file, its used during provisioning to license Fortigate
 
-You can create those with following cfy commands:\
+You can create those with the following cfy commands:\
 ``cfy secrets create fortigate_username -s <fortigate_username>``\
 ``cfy secrets create fortigate_password -s <fortigate_password>``\
 ``cfy secrets create fortigate_license -f <path to a fortigate license>``
@@ -24,8 +24,8 @@ You can create those with following cfy commands:\
 * WAN,
 * LAN.
 
-Network's NICs are conncted to security group created in network deployment deployment.
-Networks and security group names are fetched from network deployment using `get_capability` intrinsic function. 
+Network's NICs are connected to the security group created in the network deployment.
+Networks and security group names are fetched from network deployment using `get_capability` intrinsic function.
 
 ### Inputs
 
@@ -42,7 +42,7 @@ Networks and security group names are fetched from network deployment using `get
 * *vm_image_sku* - An instance of an offer, such as a major release of a distribution - fortinet_fg-vm
 * *vm_image_version* - Version of the image - default: 6.0.3
 * *vnf_vm_name* - Name of VM - default: fortigate
-* *fortigate_license_filename* - Name of the Fortigate license file (It will be uploaded to Fortigate VM with this name). It should have .lic file extension. - default: FGVM02TM19000054.lic 
+* *fortigate_license_filename* - Name of the Fortigate license file (It will be uploaded to Fortigate VM with this name). It should have .lic file extension. - default: FGVM02TM19000054.lic
 
 ### Installation
 
@@ -58,11 +58,11 @@ To delete Fortigate execute:
 
 ## Configuration
 
-Configuration requires IP addresses of VM created during provisioning, therefore provisioning deployment name 
-is required input so exposed IP addresses are fetched using *get_capability* function, ie:\
+The configuration requires the IP addresses of the VM created during provisioning, therefore the provisioning deployment name
+is required as an input. Exposed IP addresses are fetched using *get_capability* function, ie:\
 ``{ get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }``
 
-``VNFM-Fortigate-Conf.yaml`` is responsible for applying base configuration for newly created FortiGate VM. It configures all of the interfaces.
+``VNFM-Fortigate-Conf.yaml`` is responsible for applying base configuration for the newly created FortiGate VM. It configures all of the interfaces.
 It consists of one node:
 1. *fortigate_vnf_config* - Applies base configuration for Fortigate (VNF name change and basic configuration to interfaces) using [fortigate-baseline.txt](Resources/templates/fortigate-baseline.txt) file.
 

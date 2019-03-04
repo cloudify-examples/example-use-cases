@@ -18,7 +18,7 @@ This example contains blueprints implementing each of these steps. These can be 
 
 Upon completion of this example we will have a complete running network service.
 
-Note!    The infrastructure used in this example is Microsoft Azure, and the demonstrated VNFs are:
+Note!    The infrastructure used in this example is OpenStack, and the demonstrated VNFs are:
 * F5 BIG-IP VE (Load balancer)
 * Fortigate (Firewall)
 * Httpd (Web Server)
@@ -36,13 +36,13 @@ To learn more about Cloudify manager deployment go to: [Cloudify-Getting-Started
 Creation of the whole service consists of the following steps. Each step is available as a blueprint (yaml file) in this example folder.
 
 1. *Environment preparation*
-Create networks, a resource group, and a security group. For more details check [common/README](common/README.md)
+Create networks, subnets, a router and a security group. For more details check [common/README](common/README.md)
 2. *Provisioning of the VNFs*
-Create the virtual machines in Azure and connect those to the proper networks.
-Each VNF is created using a blueprint named ``VNFM-<VNF_NAME>-Prov-Azure-vm.yaml``:
-* **bigip/VNFM-F5-Prov-Azure-vm.yaml** - [BIG IP Provisioning instruction](bigip/README.md##Provisioning)
-* **fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml** - [Fortigate Provisioning instruction](fortigate/README.md##Provisioning)
-* **httpd/VNFM-HTTPD-Prov-Azure-vm.yaml** - [HTTPD Provisioning instruction](httpd/README.md##Provisioning)
+Create the virtual machines in Openstack and connect those to the proper networks.
+Each VNF is created using a blueprint named ``VNFM-<VNF_NAME>-Prov-Openstack-vm.yaml``:
+* **bigip/VNFM-F5-Prov-Openstack-vm.yaml** - [BIG IP Provisioning instruction](bigip/README.md##Provisioning)
+* **fortigate/VNFM-Fortigate-Prov-Openstack-vm.yaml** - [Fortigate Provisioning instruction](fortigate/README.md##Provisioning)
+* **httpd/VNFM-HTTPD-Prov-Openstack-vm.yaml** - [HTTPD Provisioning instruction](httpd/README.md##Provisioning)
 3. *Configure the VNFs*
 Apply basic configuration of the VNFs. This is done using blueprints named ``VNFM-<VNF_NAME>-Conf.yaml``:
 * **bigip/VNFM-F5-Conf.yaml** (licensing and VLAN configuration) - [BIG IP Configuration instruction](bigip/README.md##Configuration)

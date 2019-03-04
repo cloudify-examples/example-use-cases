@@ -19,9 +19,9 @@ IP addresses are fetched using *get_capability* function.
 
 ### Inputs
 
-* *f5_prov_deployment_name* - The name of the BIG IP Provisioning deployment, used to get management and Public IPs from BIG IP VE - default: VNFM-F5-Prov-Azure-vm
+* *f5_prov_deployment_name* - The name of the BIG IP Provisioning deployment, used to get management and Public IPs from BIG IP VE - default: VNFM-F5-Prov-Openstack-vm
 * *fg_prov_deployment_name* - The name of the Fortigate Provisioning deployment, used to get management and WAN IPs from Fortigate VM - default: VNFM-Fortigate-Conf
-* *httpd_prov_deployment_name* - The name of the HTTPD Provisioning deployment, used to fetch HTTPD LAN interface IP - default: VNFM-HTTPD-Prov-Azure-vm
+* *httpd_prov_deployment_name* - The name of the HTTPD Provisioning deployment, used to fetch HTTPD LAN interface IP - default: VNFM-HTTPD-Prov-Openstack-vm
 * *lb_public_port* - Load balancer public network port on which the service is exposed - default: 8080
 * *wan_port* - Fortigate WAN port on which the service is going to be exposed - default: '8080'
 

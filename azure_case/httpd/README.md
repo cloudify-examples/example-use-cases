@@ -7,22 +7,24 @@ Prior to any deployment You have to upload plugins, create secrets and create co
 
 ### Secrets
 
-Create below secrets on secrets store management:
+Create the below secrets in the secret store management:
 * **httpd_username** - Username for HTTPD VM, it is set during provisioning and used during configuration,
-* **httpd_password** - Password for HTTPD VM, it is set during provisioning and used during configuration. 
+* **httpd_password** - Password for HTTPD VM, it is set during provisioning and used during configuration,
+* **httpd_website** - Content of website file for HTTPD VM, it is set during provisioning and served after configuration. Exemplary website can be found under ``Resources/website/index.html``.
 
-You can create those with following cfy commands:\
+You can create those with the following cfy commands:\
 ``cfy secrets create httpd_username -s <httpd_username>``\
-``cfy secrets create httpd_password -s <httpd_password>``
+``cfy secrets create httpd_password -s <httpd_password>``\
+``cfy secrets create httpd_website -s <httpd_website>``
 
-## Provisioning 
+## Provisioning
 
-VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for creation Ubuntu VM connected to 2 networks:
+VNFM-HTTPD-Prov-Azure-vm.yaml is responsible for the creation of an Ubuntu VM connected to 2 networks:
 * Management,
 * LAN.
 
 For each network NIC, special security group is created (lan_security_group and mgmt_security_group).
-Networks names are fetched from network deployment using `get_capability` intrinsic function.
+Network names are fetched from network deployment using `get_capability` intrinsic function.
 
 ### Inputs
 * *image* - Image information - default:   
@@ -40,7 +42,7 @@ Networks names are fetched from network deployment using `get_capability` intrin
 
 ### Installation
 
-Resources created in Prerequesites subsection are fetched using capabilities mechanism.
+Resources created in Prerequesites subsection are fetched using the capabilities mechanism.
 To provision HTTPD:
 
 ``cfy install VNFM-HTTPD-Prov-Azure-vm.yaml -b VNFM-HTTPD-Prov-Azure-vm``
@@ -53,8 +55,8 @@ To delete VM execute:
 
 ## Configuration
 
-VNFM-HTTPD-Conf.yaml is responsible for starting HTTPD process on the target VM, 
-*web_server* node is responsible for creating such server using following command:\
+VNFM-HTTPD-Conf.yaml is responsible for starting HTTPD process on the target VM,
+*web_server* node is responsible for creating such server using the following command:\
 ``screen -dmS -X python3 -m http.server 8080``\
 The IP address of the target VM is fetched from VNFM-HTTPD-Prov-Azure-vm deployment using capabilities.
 

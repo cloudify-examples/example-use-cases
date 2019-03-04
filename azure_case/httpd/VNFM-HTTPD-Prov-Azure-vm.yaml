@@ -56,7 +56,7 @@ node_templates:
     type: cloudify.azure.nodes.network.VirtualNetwork
     properties:
       azure_config: *azure_config
-      name: {get_capability: [{ get_input: network_deployment_name }, virtual_network] } 
+      name: {get_capability: [{ get_input: network_deployment_name }, virtual_network] }
       location: { get_secret: azure_location }
       use_external_resource: true
     relationships:
@@ -99,10 +99,29 @@ node_templates:
       - type: cloudify.azure.relationships.contained_in_resource_group
         target: resource_group
 
+  # Cloud config for httpd, responsible for website uploading
+  cloud_config:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        write_files:
+          - path:
+              concat:
+                - "/home/"
+                - { get_secret: httpd_username }
+                - "/index.html"
+            permissions: 0644
+            owner:
+              concat:
+                - { get_secret: httpd_username }
+                - ":"
+                - { get_secret: httpd_username }
+            content: { get_secret: httpd_website }
+
   vm:
     type: cloudify.azure.nodes.compute.VirtualMachine
     properties:
-      location: { get_property: [ resource_group, location ] }  
+      location: { get_property: [ resource_group, location ] }
       retry_after: { get_input: retry_after }
       os_family: linux
       name: { concat: [ { get_input: resource_prefix }, 'httpd', { get_input: resource_suffix } ] }
@@ -112,6 +131,7 @@ node_templates:
         storageProfile:
           imageReference: { get_input: image}
         osProfile:
+          customData: { get_attribute: [ cloud_config, cloud_config ] }
           computerName: { get_property: [SELF, name] }
           adminUsername: { get_secret: httpd_username }
           adminPassword: { get_secret: httpd_password }
@@ -127,6 +147,9 @@ node_templates:
         target: lan_nic
       - type: cloudify.azure.relationships.connected_to_nic
         target: mgmt_nic
+      - type: cloudify.relationships.depends_on
+        target: cloud_config
+
 # mgmt
   mgmt_security_group:
     type: cloudify.azure.nodes.network.NetworkSecurityGroup
@@ -238,7 +261,7 @@ node_templates:
   lan_nic:
     type: cloudify.azure.nodes.network.NetworkInterfaceCard
     properties:
-      location: { get_property: [ resource_group, location ] } 
+      location: { get_property: [ resource_group, location ] }
       azure_config: *azure_config
       name: { concat: [ { get_input: resource_prefix }, 'httpd_lan_n', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
@@ -254,7 +277,7 @@ node_templates:
   lan_ip_cfg:
     type: cloudify.azure.nodes.network.IPConfiguration
     properties:
-      location: { get_property: [ resource_group, location ] } 
+      location: { get_property: [ resource_group, location ] }
       azure_config: *azure_config
       name: { concat: [ { get_input: resource_prefix }, 'httpd_lan_ic', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
