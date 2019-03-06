@@ -6,6 +6,7 @@ description: >
 imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
   - plugin:cloudify-openstack-plugin
+  - plugin:cloudify-utilities-plugin
 
 inputs:
 
@@ -23,11 +24,13 @@ inputs:
 
   flavor_id:
     type: string
-    default: f7cfaaa8-e2db-4f9b-a65b-6a407f340960
+    # default: f7cfaaa8-e2db-4f9b-a65b-6a407f340960 #MEMSET
+    default: 8f68d4e5-4281-48c0-ad43-a8ac58d635f0
 
   image_id:
     type: string
-    default: 6d8ff903-f35b-43df-b7c2-e219929924b9
+    default: 7f5477bd-c2a8-4608-82ae-0ca2a9bf5254
+    # default: 8577e342-ff99-4737-8aa3-2a8178eaa891 #MEMSET
 
   vnf_vm_name:
     type: string
@@ -152,6 +155,31 @@ node_templates:
       create_if_missing: False
       resource_id: { get_input: image_id }
 
+  cloud_config:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        write_files:
+          - path: /config/check_mcpd_status.sh
+            permissions: 0755
+            owner: root:root
+            content: |
+              #!/bin/sh
+              echo 'preOnboard: Starting MCP status check' >> /var/log/cloud-init.log
+              checks=0
+              while [ $checks -lt 120 ]; do
+                  echo preOnboard: checking mcpd
+                  if tmsh -a show sys mcp-state field-fmt | grep -q running; then
+                      echo preOnboard: mcpd ready >> /var/log/cloud-init.log
+                      break
+                  fi
+                  echo preOnboard: mcpd not ready yet
+                  let checks=checks+1
+                  sleep 10
+              done
+        runcmd:
+          - nohup sh -c '/config/check_mcpd_status.sh'
+
   vm:
     type: cloudify.openstack.nodes.Server
     properties:
@@ -171,15 +199,19 @@ node_templates:
                   - { get_input: resource_suffix }
               image: { get_property: [ image, resource_id ] }
               flavor: { get_input: flavor_id }
+              userdata: { get_attribute: [ cloud_config, cloud_config ] }
+              config_drive: True
     relationships:
     - type: cloudify.openstack.server_connected_to_port
       target: mgmt_port
     - type: cloudify.openstack.server_connected_to_port
-      target: public_port
-    - type: cloudify.openstack.server_connected_to_port
       target: wan_port
+    - type: cloudify.openstack.server_connected_to_port
+      target: public_port
     - type: cloudify.relationships.depends_on
       target: image
+    - type: cloudify.relationships.depends_on
+      target: cloud_config
 
 
 capabilities:

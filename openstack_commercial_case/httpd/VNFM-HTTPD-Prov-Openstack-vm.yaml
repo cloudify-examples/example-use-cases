@@ -20,11 +20,14 @@ inputs:
 
   flavor_id:
     type: string
-    default: 6e2d4276-0390-4a24-b6ab-40f388edcc87
+    # default: 6e2d4276-0390-4a24-b6ab-40f388edcc87
+    default: 3
 
   image_id:
     type: string
-    default: ee6a6582-1351-4f8b-b132-a90b7db88171
+    # default: ee6a6582-1351-4f8b-b132-a90b7db88171
+    # default: d732f334-28d8-4351-b64f-96375314c4be
+    default: 1d6340df-2f14-41e6-ab27-bbd35e818fdf
 
   vnf_vm_name:
     type: string
@@ -153,22 +156,19 @@ node_templates:
     properties:
       resource_config:
         users:
-          - name: { get_secret: httpd_username }
+          - name: ubuntu
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
             ssh-authorized-keys:
               - { get_attribute: [ keypair, public_key_export ] }
         write_files:
-          - path:
-              concat:
-                - "/home/"
-                - { get_secret: httpd_username }
-                - "/index.html"
+          - path: "/home/ubuntu/index.html"
             permissions: 0644
-            owner:
-              concat:
-                - { get_secret: httpd_username }
-                - ":"
-                - { get_secret: httpd_username }
+            owner: ubuntu:ubuntu
             content: { get_secret: httpd_website }
+        runcmd:
+          - ifconfig ens4 up
+          - dhclient ens4
     relationships:
       - type: cloudify.relationships.depends_on
         target: keypair
@@ -190,8 +190,9 @@ node_templates:
                   - { get_input: resource_prefix }
                   - "_httpd_vm"
                   - { get_input: resource_suffix }
-              image: { get_property: [ image, resource_id ] }
+              image: { get_input: image_id }
               flavor: { get_input: flavor_id }
+              key_name: ''
               userdata: { get_attribute: [ cloud_config, cloud_config ] }
     relationships:
     - type: cloudify.openstack.server_connected_to_port

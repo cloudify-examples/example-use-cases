@@ -11,7 +11,8 @@ inputs:
 
   external_network_name:
     description: Openstack tenant external network name.
-    default: ext-net
+    # default: ext-net  #MEMSET
+    default: GATEWAY_NET
 
   resource_prefix:
     description: >
@@ -66,6 +67,9 @@ inputs:
       - port_range_min: 1
         port_range_max: 65535
         protocol: udp
+      - port_range_min: null
+        port_range_max: null
+        protocol: icmp
 
 
 dsl_definitions:
@@ -193,6 +197,7 @@ node_templates:
         cidr: { get_input: wan_subnet_cidr }
         dns_nameservers: { get_input: nameservers }
         allocation_pools: { get_input: wan_subnet_allocation_pools }
+        gateway_ip: null
     relationships:
     - type: cloudify.relationships.contained_in
       target: wan_network
@@ -211,6 +216,7 @@ node_templates:
         cidr: { get_input: lan_subnet_cidr }
         dns_nameservers: { get_input: nameservers }
         allocation_pools: { get_input: lan_subnet_allocation_pools }
+        gateway_ip: null
     relationships:
     - type: cloudify.relationships.contained_in
       target: lan_network
