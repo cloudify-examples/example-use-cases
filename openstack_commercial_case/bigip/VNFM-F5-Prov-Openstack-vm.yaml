@@ -24,13 +24,11 @@ inputs:
 
   flavor_id:
     type: string
-    # default: f7cfaaa8-e2db-4f9b-a65b-6a407f340960 #MEMSET
     default: 8f68d4e5-4281-48c0-ad43-a8ac58d635f0
 
   image_id:
     type: string
     default: 7f5477bd-c2a8-4608-82ae-0ca2a9bf5254
-    # default: 8577e342-ff99-4737-8aa3-2a8178eaa891 #MEMSET
 
   vnf_vm_name:
     type: string
@@ -165,20 +163,19 @@ node_templates:
             owner: root:root
             content: |
               #!/bin/sh
-              echo 'preOnboard: Starting MCP status check' >> /var/log/cloud-init.log
+              echo preOnboard: Starting MCP status check
               checks=0
               while [ $checks -lt 120 ]; do
                   echo preOnboard: checking mcpd
                   if tmsh -a show sys mcp-state field-fmt | grep -q running; then
-                      echo preOnboard: mcpd ready >> /var/log/cloud-init.log
+                      echo preOnboard: mcpd ready
+                      sleep 10
                       break
                   fi
                   echo preOnboard: mcpd not ready yet
                   let checks=checks+1
                   sleep 10
               done
-        runcmd:
-          - nohup sh -c '/config/check_mcpd_status.sh'
 
   vm:
     type: cloudify.openstack.nodes.Server

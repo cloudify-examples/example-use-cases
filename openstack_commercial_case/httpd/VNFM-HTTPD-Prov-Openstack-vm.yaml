@@ -20,13 +20,10 @@ inputs:
 
   flavor_id:
     type: string
-    # default: 6e2d4276-0390-4a24-b6ab-40f388edcc87
     default: 3
 
   image_id:
     type: string
-    # default: ee6a6582-1351-4f8b-b132-a90b7db88171
-    # default: d732f334-28d8-4351-b64f-96375314c4be
     default: 1d6340df-2f14-41e6-ab27-bbd35e818fdf
 
   vnf_vm_name:
