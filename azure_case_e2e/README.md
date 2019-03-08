@@ -33,7 +33,7 @@ Create the below secrets in the secret store management:
     * *azure_location* - Specifies the supported Azure location for the resource
     * *bigip_username* - Username for BIG IP VE, it is set during provisioning and used during configuration, "admin" is not allowed
     * *bigip_password* - Password for BIG IP VE, it is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special character. Control characters are not allowed
-    * *bigip_license_key* - License key for BIG IP VE, it is being applied during configuration
+    * *bigip_license* - License key for BIG IP VE, it is being applied during configuration
     * *fortigate_username* - Username for Fortigate VM, it is set during provisioning and used during configuration
     * *fortigate_password* - Password for Fortigate VM, it is set during provisioning and used during configuration
     * *fortigate_license* - Content of license file, its used during provisioning to license Fortigate
@@ -49,7 +49,7 @@ You can create those with the following cfy commands:\
 ``cfy secrets create azure_location -s <azure_location>``\
 ``cfy secrets create bigip_username -s <bigip_username>``\
 ``cfy secrets create bigip_password -s <bigip_password>``\
-``cfy secrets create bigip_license_key -s <bigip_license_key>``\
+``cfy secrets create bigip_license -s <bigip_license>``\
 ``cfy secrets create fortigate_username -s <fortigate_username>``\
 ``cfy secrets create fortigate_password -s <fortigate_password>``\
 ``cfy secrets create fortigate_license -f <path to a fortigate license>``\
@@ -59,21 +59,21 @@ You can create those with the following cfy commands:\
 
 ### Inputs
 
-* *common_prov_name* - The name of the Common resources provisioning deployment - default: VNFM-Networking-Prov-Azure-networks
+* *network_prov_name* - The name of the common network resources provisioning deployment - default: VNFM-Networking-Prov-Azure-networks
 * *f5_prov_name* - The name of the BIG IP Provisioning deployment - default: VNFM-F5-Prov-Azure-vm
 * *f5_conf_name* - The name of the BIG IP Configuration deployment - default: VNFM-F5-Conf
 * *fg_prov_name* - The name of the Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Azure-vm
 * *fg_conf_name* - The name of the Fortigate Configuration deployment - default: VNFM-Fortigate-Conf
 * *httpd_prov_name* - The name of the HTTPD Provisioning deployment - default: VNFM-HTTPD-Prov-Azure-vm
 * *httpd_conf_name* - The name of the HTTPD Configuration deployment - default: VNFM-HTTPD-Conf
-* *service_prov_name* - The name of the Common resources provisioning deployment - default: NS-LB-Firewall-F5-Fortigate-HTTPD
+* *service_prov_name* - The name of the service provisioning deployment - default: NS-LB-Firewall-F5-Fortigate-HTTPD
 
 
 ### Installation
 
 To apply the service configuration execute:
 
-``cfy install VNFM-E2E-F5-Fortigate-HTTPD.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
+``cfy install e2e.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
 
 ### Service validation
 

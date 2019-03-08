@@ -3,8 +3,16 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: >
   Create an Example Azure Network.
 
+dsl_definitions:
+
+  client_config: &client_config
+    subscription_id: { get_secret: azure_subscription_id }
+    tenant_id: { get_secret: azure_tenant_id }
+    client_id: { get_secret: azure_client_id }
+    client_secret: { get_secret: azure_client_secret }
+
 imports:
-  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-azure-plugin
 
 inputs:
@@ -65,15 +73,6 @@ inputs:
           priority: 101
           access: Allow
           direction: Inbound
-
-dsl_definitions:
-
-  client_config: &client_config
-    subscription_id: { get_secret: azure_subscription_id }
-    tenant_id: { get_secret: azure_tenant_id }
-    client_id: { get_secret: azure_client_id }
-    client_secret: { get_secret: azure_client_secret }
-
 
 node_templates:
 

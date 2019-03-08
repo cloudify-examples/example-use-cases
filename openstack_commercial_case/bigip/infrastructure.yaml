@@ -1,11 +1,15 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
+description: >
+  Create an instance of BIG-IP on OpenStack.
+
 imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
   - plugin:cloudify-openstack-plugin
   - plugin:cloudify-utilities-plugin
 
 inputs:
+
   resource_prefix:
     description: Prefix of every resource created at this deployment on Openstack.
     default: cfy
@@ -20,15 +24,16 @@ inputs:
 
   flavor_id:
     type: string
-    default: 6e2d4276-0390-4a24-b6ab-40f388edcc87
+    default: 8f68d4e5-4281-48c0-ad43-a8ac58d635f0
 
   image_id:
     type: string
-    default: ee6a6582-1351-4f8b-b132-a90b7db88171
+    default: 7f5477bd-c2a8-4608-82ae-0ca2a9bf5254
 
   vnf_vm_name:
     type: string
-    default: httpd
+    default: bigip
+
 
 dsl_definitions:
 
@@ -48,12 +53,19 @@ node_templates:
       use_external_resource: true
       resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, mgmt_network] }
 
-  lan_network:
+  public_network:
     type: cloudify.openstack.nodes.Network
     properties:
       openstack_config: *client_config
       use_external_resource: true
-      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, lan_network] }
+      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, public_network] }
+
+  wan_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *client_config
+      use_external_resource: true
+      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, wan_network] }
 
   network_security_group:
     type: cloudify.openstack.nodes.SecurityGroup
@@ -70,6 +82,14 @@ node_templates:
       floatingip:
         floating_network_name: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
 
+  public_floating_ip_address:
+    type: cloudify.openstack.nodes.FloatingIP
+    properties:
+      openstack_config: *client_config
+      use_external_resource: false
+      floatingip:
+        floating_network_name: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+
   mgmt_port:
     type: cloudify.openstack.nodes.Port
     properties:
@@ -78,7 +98,7 @@ node_templates:
         name:
           concat:
             - { get_input: resource_prefix }
-            - "_httpd_mgmt_port"
+            - "_bigip_mgmt_port"
             - { get_input: resource_suffix }
     relationships:
     - type: cloudify.relationships.contained_in
@@ -88,7 +108,7 @@ node_templates:
     - type: cloudify.openstack.port_connected_to_floating_ip
       target: mgmt_floating_ip_address
 
-  lan_port:
+  public_port:
     type: cloudify.openstack.nodes.Port
     properties:
       openstack_config: *client_config
@@ -96,11 +116,29 @@ node_templates:
         name:
           concat:
             - { get_input: resource_prefix }
-            - "_httpd_lan_port"
+            - "_bigip_public_port"
             - { get_input: resource_suffix }
     relationships:
     - type: cloudify.relationships.contained_in
-      target: lan_network
+      target: public_network
+    - type: cloudify.openstack.port_connected_to_security_group
+      target: network_security_group
+    - type: cloudify.openstack.port_connected_to_floating_ip
+      target: public_floating_ip_address
+
+  wan_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      openstack_config: *client_config
+      port:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_bigip_wan_port"
+            - { get_input: resource_suffix }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: wan_network
     - type: cloudify.openstack.port_connected_to_security_group
       target: network_security_group
 
@@ -115,63 +153,29 @@ node_templates:
       create_if_missing: False
       resource_id: { get_input: image_id }
 
-  keypair:
-    type: cloudify.keys.nodes.RSAKey
-    properties:
-      resource_config:
-        public_key_path:
-          concat:
-            - "/etc/cloudify/.ssh/"
-            - { get_input: resource_prefix }
-            - "_httpd_keypair"
-            - { get_input: resource_suffix }
-            - ".pub"
-        private_key_path:
-          concat:
-            - "/etc/cloudify/.ssh/"
-            - { get_input: resource_prefix }
-            - "_httpd_keypair"
-            - { get_input: resource_suffix }
-            - ".pem"
-        openssh_format: true
-      use_secret_store: false
-      key_name:
-        concat:
-          - { get_input: resource_prefix }
-          - "_httpd_keypair"
-          - { get_input: resource_suffix }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: keys.cloudify_ssh_key.operations.create
-          inputs:
-            store_private_key_material: true
-
-  # Cloud config for httpd, responsible for website uploading
   cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
       resource_config:
-        users:
-          - name: { get_secret: httpd_username }
-            ssh-authorized-keys:
-              - { get_attribute: [ keypair, public_key_export ] }
         write_files:
-          - path:
-              concat:
-                - "/home/"
-                - { get_secret: httpd_username }
-                - "/index.html"
-            permissions: 0644
-            owner:
-              concat:
-                - { get_secret: httpd_username }
-                - ":"
-                - { get_secret: httpd_username }
-            content: { get_secret: httpd_website }
-    relationships:
-      - type: cloudify.relationships.depends_on
-        target: keypair
+          - path: /config/check_mcpd_status.sh
+            permissions: 0755
+            owner: root:root
+            content: |
+              #!/bin/sh
+              echo preOnboard: Starting MCP status check
+              checks=0
+              while [ $checks -lt 120 ]; do
+                  echo preOnboard: checking mcpd
+                  if tmsh -a show sys mcp-state field-fmt | grep -q running; then
+                      echo preOnboard: mcpd ready
+                      sleep 10
+                      break
+                  fi
+                  echo preOnboard: mcpd not ready yet
+                  let checks=checks+1
+                  sleep 10
+              done
 
   vm:
     type: cloudify.openstack.nodes.Server
@@ -188,16 +192,19 @@ node_templates:
               name:
                 concat:
                   - { get_input: resource_prefix }
-                  - "_httpd_vm"
+                  - "_bigip_vm"
                   - { get_input: resource_suffix }
               image: { get_property: [ image, resource_id ] }
               flavor: { get_input: flavor_id }
               userdata: { get_attribute: [ cloud_config, cloud_config ] }
+              config_drive: True
     relationships:
     - type: cloudify.openstack.server_connected_to_port
       target: mgmt_port
     - type: cloudify.openstack.server_connected_to_port
-      target: lan_port
+      target: wan_port
+    - type: cloudify.openstack.server_connected_to_port
+      target: public_port
     - type: cloudify.relationships.depends_on
       target: image
     - type: cloudify.relationships.depends_on
@@ -205,9 +212,12 @@ node_templates:
 
 
 capabilities:
-  vm_public_ip_address:
+
+  vm_public_mgmt_ip_address:
     value: { get_attribute: [mgmt_floating_ip_address, floating_ip_address] }
-  lan_ip:
-    value: { get_attribute: [lan_port, fixed_ip_address] }
-  private_key_content:
-    value: { get_attribute: [keypair, private_key_export] }
+  vm_public_ip_address:
+    value: { get_attribute: [public_floating_ip_address, floating_ip_address] }
+  wan_ip:
+    value: { get_attribute: [wan_port, fixed_ip_address] }
+  public_ip:
+    value: { get_attribute: [public_port, fixed_ip_address] }
