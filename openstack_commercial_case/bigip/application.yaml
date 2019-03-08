@@ -47,7 +47,7 @@ node_templates:
             calls:
               - template: Resources/templates/install_license.txt
                 params:
-                  REG_KEY: { get_secret: bigip_license_key }
+                  REG_KEY: { get_secret: bigip_license }
         delete:
           inputs:
             terminal_auth: *terminal_auth

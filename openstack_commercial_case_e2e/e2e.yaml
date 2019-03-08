@@ -24,7 +24,7 @@ imports:
 # The inputs section includes the names of the particular blueprints and
 # deployments which this blueprint will leverage.
 inputs:
-  common_prov_name:
+  network_prov_name:
     description: Name of common resources provisioning blueprint/deployment
     default: VNFM-Networking-Prov-Openstack-networks
 
@@ -61,7 +61,7 @@ inputs:
 # building blocks.
 node_templates:
 
-  # Common:
+  # Network-topology:
   #   This blueprint is responsible for creating all of the common resources,
   #   which are later used in other blueprints. Especially: router,
   #   networks, subnets and security groups.
@@ -69,16 +69,16 @@ node_templates:
   #   deployment creation.
   #   There's no relationships defined under this node, which means that during
   #   install it will be instantiated at first.
-  common_prov:
+  network_prov:
     type: cloudify.nodes.DeploymentProxy
     properties:
       resource_config:
         blueprint:
-          id: { get_input: common_prov_name }
-          blueprint_archive: Resources/common.zip
-          main_file_name: VNFM-Networking-Prov-Openstack-networks.yaml
+          id: { get_input: network_prov_name }
+          blueprint_archive: Resources/network-topology.zip
+          main_file_name: infrastructure.yaml
         deployment:
-          id: { get_input: common_prov_name }
+          id: { get_input: network_prov_name }
 
 
   ### PROVISIONING ###
@@ -88,10 +88,10 @@ node_templates:
   #   infrastructure, including the necessary network interfaces.
   #   DeploymentProxy is used for the blueprint uploading and the
   #   deployment creation.
-  #   A "depends_on" relationship which targets the "common_prov" node is defined.
+  #   A "depends_on" relationship which targets the "network_prov" node is defined.
   #   It means, that during the install workflow, "f5_prov" node will be instantiated
-  #   after "common_prov" node will. That will alllow the "f5_prov" node to create network
-  #   interfaces in the networks created by "common_prov" blueprint.
+  #   after "network_prov" node will. That will alllow the "f5_prov" node to create network
+  #   interfaces in the networks created by "network_prov" blueprint.
   f5_prov:
     type: cloudify.nodes.DeploymentProxy
     properties:
@@ -99,22 +99,22 @@ node_templates:
         blueprint:
           id: { get_input: f5_prov_name }
           blueprint_archive: Resources/bigip.zip
-          main_file_name: VNFM-F5-Prov-Openstack-vm.yaml
+          main_file_name: infrastructure.yaml
         deployment:
           id: { get_input: f5_prov_name }
     relationships:
       - type: cloudify.relationships.depends_on
-        target: common_prov
+        target: network_prov
 
   # FortiGate Provisioning:
   #   This blueprint is responsible for provisioning the FortiGate VM in OpenStack
   #   infrastructure, including the necessary network interfaces.
   #   DeploymentProxy is used for the blueprint uploading and the
   #   deployment creation.
-  #   A "depends_on" relationship which targets the "common_prov" node is defined.
+  #   A "depends_on" relationship which targets the "network_prov" node is defined.
   #   It means, that during the install workflow, "fg_prov" node will be instantiated
-  #   after "common_prov" node will. That will alllow the "fg_prov" node to create network
-  #   interfaces in the networks created by "common_prov" blueprint.
+  #   after "network_prov" node will. That will alllow the "fg_prov" node to create network
+  #   interfaces in the networks created by "network_prov" blueprint.
   fg_prov:
     type: cloudify.nodes.DeploymentProxy
     properties:
@@ -122,22 +122,22 @@ node_templates:
         blueprint:
           id: { get_input: fg_prov_name }
           blueprint_archive: Resources/fortigate.zip
-          main_file_name: VNFM-Fortigate-Prov-Openstack-vm.yaml
+          main_file_name: infrastructure.yaml
         deployment:
           id: { get_input: fg_prov_name }
     relationships:
       - type: cloudify.relationships.depends_on
-        target: common_prov
+        target: network_prov
 
   # HTTPD Provisioning:
   #   This blueprint is responsible for provisioning the HTTPD VM in OpenStack
   #   infrastructure, including the necessary network interfaces.
   #   DeploymentProxy is used for the blueprint uploading and the
   #   deployment creation.
-  #   A "depends_on" relationship which targets the "common_prov" node is defined.
+  #   A "depends_on" relationship which targets the "network_prov" node is defined.
   #   It means, that during the install workflow, "httpd_prov" node will be instantiated
-  #   after "common_prov" node will. That will alllow the "httpd_prov" node to create network
-  #   interfaces in the networks created by "common_prov" blueprint.
+  #   after "network_prov" node will. That will alllow the "httpd_prov" node to create network
+  #   interfaces in the networks created by "network_prov" blueprint.
   httpd_prov:
     type: cloudify.nodes.DeploymentProxy
     properties:
@@ -145,12 +145,12 @@ node_templates:
         blueprint:
           id: { get_input: httpd_prov_name }
           blueprint_archive: Resources/httpd.zip
-          main_file_name: VNFM-HTTPD-Prov-Openstack-vm.yaml
+          main_file_name: infrastructure.yaml
         deployment:
           id: { get_input: httpd_prov_name }
     relationships:
       - type: cloudify.relationships.depends_on
-        target: common_prov
+        target: network_prov
 
   ### CONFIGURATION ###
 
@@ -171,7 +171,7 @@ node_templates:
         blueprint:
           id: { get_input: f5_conf_name }
           blueprint_archive: Resources/bigip.zip
-          main_file_name: VNFM-F5-Conf.yaml
+          main_file_name: application.yaml
         deployment:
           id: { get_input: f5_conf_name }
     relationships:
@@ -195,7 +195,7 @@ node_templates:
         blueprint:
           id: { get_input: fg_conf_name }
           blueprint_archive: Resources/fortigate.zip
-          main_file_name: VNFM-Fortigate-Conf.yaml
+          main_file_name: application.yaml
         deployment:
           id: { get_input: fg_conf_name }
     relationships:
@@ -219,7 +219,7 @@ node_templates:
         blueprint:
           id: { get_input: httpd_conf_name }
           blueprint_archive: Resources/httpd.zip
-          main_file_name: VNFM-HTTPD-Conf.yaml
+          main_file_name: application.yaml
         deployment:
           id: { get_input: httpd_conf_name }
     relationships:
@@ -245,7 +245,7 @@ node_templates:
         blueprint:
           id: { get_input: service_prov_name }
           blueprint_archive: Resources/service.zip
-          main_file_name: NS-LB-Firewall-F5-Fortigate-HTTPD.yaml
+          main_file_name: service.yaml
         deployment: {}
         # deployment:
         #   id: { get_input: service_prov_name }
