@@ -4,10 +4,10 @@ Upon completion of this example we will have a complete running network service.
 
 ![ns](https://user-images.githubusercontent.com/30900001/52050834-12889e00-2552-11e9-9a68-452e92cc7014.png)
 
-This series of blueprints demonstrates how to install a simple network service consisting of a load balancer and a firewall. To make it a tad more interesting we will be deploying a simple web service to allow for complete user experience. All of the examples are currently implemented only for Azure.
+This series of blueprints demonstrates how to install a simple network service consisting of a load balancer and a firewall. To make it a tad more interesting we will be deploying a simple web service to allow for complete user experience.
 
 **Note!**
-The infrastructure used in this example is Microsoft Azure, and the demonstrated VNFs are:
+The infrastructure used in this example is OpenStack, and the demonstrated VNFs are:
   * F5 BIG-IP VE (Load balancer)
   * Fortigate (Firewall)
   * Httpd (Web Server)

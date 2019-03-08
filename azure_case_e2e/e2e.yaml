@@ -76,7 +76,7 @@ node_templates:
         blueprint:
           id: { get_input: network_prov_name }
           blueprint_archive: Resources/network-topology.zip
-          main_file_name: VNFM-Networking-Prov-Azure-networks.yaml
+          main_file_name: infrastructure.yaml
         deployment:
           id: { get_input: network_prov_name }
 
@@ -100,7 +100,7 @@ node_templates:
         blueprint:
           id: { get_input: f5_prov_name }
           blueprint_archive: Resources/bigip.zip
-          main_file_name: VNFM-F5-Prov-Azure-vm.yaml
+          main_file_name: infrastructure.yaml
         deployment:
           id: { get_input: f5_prov_name }
     relationships:
@@ -124,7 +124,7 @@ node_templates:
         blueprint:
           id: { get_input: fg_prov_name }
           blueprint_archive: Resources/fortigate.zip
-          main_file_name: VNFM-Fortigate-Prov-Azure-vm.yaml
+          main_file_name: infrastructure.yaml
         deployment:
           id: { get_input: fg_prov_name }
     relationships:
@@ -148,7 +148,7 @@ node_templates:
         blueprint:
           id: { get_input: httpd_prov_name }
           blueprint_archive: Resources/httpd.zip
-          main_file_name: VNFM-HTTPD-Prov-Azure-vm.yaml
+          main_file_name: infrastructure.yaml
         deployment:
           id: { get_input: httpd_prov_name }
     relationships:
@@ -174,7 +174,7 @@ node_templates:
         blueprint:
           id: { get_input: f5_conf_name }
           blueprint_archive: Resources/bigip.zip
-          main_file_name: VNFM-F5-Conf.yaml
+          main_file_name: application.yaml
         deployment:
           id: { get_input: f5_conf_name }
     relationships:
@@ -198,7 +198,7 @@ node_templates:
         blueprint:
           id: { get_input: fg_conf_name }
           blueprint_archive: Resources/fortigate.zip
-          main_file_name: VNFM-Fortigate-Conf.yaml
+          main_file_name: application.yaml
         deployment:
           id: { get_input: fg_conf_name }
     relationships:
@@ -222,7 +222,7 @@ node_templates:
         blueprint:
           id: { get_input: httpd_conf_name }
           blueprint_archive: Resources/httpd.zip
-          main_file_name: VNFM-HTTPD-Conf.yaml
+          main_file_name: application.yaml
         deployment:
           id: { get_input: httpd_conf_name }
     relationships:
@@ -248,7 +248,7 @@ node_templates:
         blueprint:
           id: { get_input: service_prov_name }
           blueprint_archive: Resources/service.zip
-          main_file_name: NS-LB-Firewall-F5-Fortigate-HTTPD.yaml
+          main_file_name: service.yaml
         deployment:
           id: { get_input: service_prov_name }
           outputs:
