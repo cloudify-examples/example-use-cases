@@ -1,6 +1,6 @@
 # Network Service - Commercial VNFs
 
-In this examples we demonstrate how to construct a simple network service consisting of a load balancer and a firewall. To make it a tad more interesting we will be deploying a simple web service to allow for complete user experience:
+In this example we demonstrate how to construct a simple network service consisting of a load balancer and a firewall. To make it a tad more interesting we will be deploying a simple web service to allow for complete user experience:
 
 ![ns](https://user-images.githubusercontent.com/30900001/52050834-12889e00-2552-11e9-9a68-452e92cc7014.png)
 
@@ -29,7 +29,7 @@ Before we get started, please make sure you have a Cloudify manager deployed.
 
 The cloudify manager is available in multiple formats ranging from Docker to RPM. In this tutorial we will be using the docker option and assume that it is deployed on your local computer. It can be of course deployed using any other method and on any given platform.
 
-To learn more about Cloudify manager deployment go to: [Cloudify-Getting-Started](https://cloudify.co/download/)
+To learn more about Cloudify manager deployment go to: [Cloudify documentation](https://docs.cloudify.co/latest)
 
 ## Example overview
 
@@ -40,16 +40,16 @@ Create networks, a resource group, and a security group. For more details check 
 2. *Provisioning of the VNFs*
 Create the virtual machines in Azure and connect those to the proper networks.
 Each VNF is created using a blueprint named ``VNFM-<VNF_NAME>-Prov-Azure-vm.yaml``:
-* **bigip/VNFM-F5-Prov-Azure-vm.yaml** - [BIG IP Provisioning instruction](bigip/README.md##Provisioning)
-* **fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml** - [Fortigate Provisioning instruction](fortigate/README.md##Provisioning)
-* **httpd/VNFM-HTTPD-Prov-Azure-vm.yaml** - [HTTPD Provisioning instruction](httpd/README.md##Provisioning)
+* **bigip/VNFM-F5-Prov-Azure-vm.yaml** - [BIG IP Provisioning instructions](bigip/README.md##Provisioning)
+* **fortigate/VNFM-Fortigate-Prov-Azure-vm.yaml** - [Fortigate Provisioning instructions](fortigate/README.md##Provisioning)
+* **httpd/VNFM-HTTPD-Prov-Azure-vm.yaml** - [HTTPD Provisioning instructions](httpd/README.md##Provisioning)
 3. *Configure the VNFs*
-Apply basic configuration of the VNFs. This is done using blueprints named ``VNFM-<VNF_NAME>-Conf.yaml``:
-* **bigip/VNFM-F5-Conf.yaml** (licensing and VLAN configuration) - [BIG IP Configuration instruction](bigip/README.md##Configuration)
-* **fortigate/VNFM-Fortigate-Conf.yaml** (Setting firewall rules and port forwarding) - [Fortigate Configuration instruction](fortigate/README.md##Configuration)
-* **httpd/VNFM-HTTPD-Conf.yaml** (Creation of Web Server) - [HTTPD Configuration instruction](httpd/README.md##Configuration)
+Apply basic configuration of the VNFs. This is done using a blueprint named ``VNFM-<VNF_NAME>-Conf.yaml``:
+* **bigip/VNFM-F5-Conf.yaml** (licensing and VLAN configuration) - [BIG IP Configuration instructions](bigip/README.md##Configuration)
+* **fortigate/VNFM-Fortigate-Conf.yaml** (Setting firewall rules and port forwarding) - [Fortigate Configuration instructions](fortigate/README.md##Configuration)
+* **httpd/VNFM-HTTPD-Conf.yaml** (Creation of Web Server) - [HTTPD Configuration instructions](httpd/README.md##Configuration)
 4. *Service chaining*
-The last step creates a service chain of connected network services (Load Balancer, Firewall and Web Server). In this case service chaining consists of port forwarding rule on Fortigate and load balancing rule on BIG IP in order to pass traffic through.
-Use the ``service/NS-LB-Firewall-F5-Fortigate-HTTPD.yaml`` - [Service creation instruction](service/README.md)
+The last step creates a service chain of the network services (Load Balancer, Firewall and Web Server). In our case, the service chaining consists of a port forwarding rule in the Fortigate firewall and a load balancing rule in the BIG IP load balancer in order to pass traffic through.
+Use the ``service/NS-LB-Firewall-F5-Fortigate-HTTPD.yaml`` - [Service creation instructions](service/README.md)
 
 Once all steps had been performed, you should be able to access the web page displayed by the web service by accessing the ip of the load balancer (This IP will be the output of the service deployment flow, and will be titled web_server).
